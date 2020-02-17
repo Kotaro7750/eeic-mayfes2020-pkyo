@@ -1,0 +1,26 @@
+{
+  "name": "eeic-mayfes2020-pkyo",
+  "version": "1.0.0",
+  "description": "## React.js",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "watch": "webpack -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kotaro7750/eeic-mayfes2020-pkyo.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Kotaro7750/eeic-mayfes2020-pkyo/issues"
+  },
+  "homepage": "https://github.com/Kotaro7750/eeic-mayfes2020-pkyo#readme"
+}
