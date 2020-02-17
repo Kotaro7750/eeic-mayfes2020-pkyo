@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EEIC Mayfes 2020</title>
-  <script src="bundle.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEIC Mayfes 2020</title>
+    <script src="./bundle.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>五月祭 2020 プログラミング教室</h1>
+    <p>
+        <button id="runcode"> Run Code</button>
+    </p>
+    <!-- blockly workspace -->
+    <div id="blocklyDiv" style="height:480px;width:600px;"></div>
+    <xml id="toolbox" style="display:none;">
+        <category name="logic">
+            <block type="lightswitch">
+            </block>
+        </category>
+    </xml>
+    <!-- added to the page -->
+    <div id="circle"></div>
 </body>
 </html>
