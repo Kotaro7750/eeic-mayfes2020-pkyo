@@ -80,7 +80,6 @@ class BlocklyRunner {
         // 主に実行ボタンの描画更新（実行中/実行できるよ）の場所
         // ぶっちゃけボタンのclass変更してCSS変えるだけor画像切り替えるだけ
         var element = document.getElementById( "executeButton" ) ;
-        console.log("!!!!!!!!!!!!!!")
         if(isRunning){
             element.className = "circle_running_btn";
             element.innerHTML="■";
@@ -90,9 +89,10 @@ class BlocklyRunner {
         }
     }
 
-    endRunning() {
-        this.isRunning = false;
-        this.updateBlockly();
+    endRunning(isRunning) {
+        isRunning = false;
+        this.updateBlockly(isRunning);
+        return isRunning;
     };
 };
 

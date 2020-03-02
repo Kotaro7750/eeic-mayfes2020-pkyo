@@ -72,6 +72,15 @@ function create() {
     player.targetX = player.x;
     player.targetY = player.y;
 }
+function resetStage(){
+    player.gridX = stageRunner.stageConfig.playerX;
+    player.gridY = stageRunner.stageConfig.playerY;
+    player.x=mapDat.tileWidth * player.gridX * map2Img
+    player.y=mapDat.tileWidth * (player.gridY + 0.9) * map2Img
+    player.targetX = player.x;
+    player.targetY = player.y;
+    tick = 0;
+};
 
 function update() {
     // move: player.x += mapDat.tileWidth * map2Img * velocity;
@@ -107,6 +116,7 @@ function tryMove(player, dir) {
 function startBlockly() {
     console.log("start");
     if (!isRunning) {
+        resetStage();
         isRunning = true;
         window.LoopTrap = 1000;
         Blockly.JavaScript.INFINITE_LOOP_TRAP = 'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
@@ -125,6 +135,7 @@ function startBlockly() {
         blocklyRunner.updateBlockly(isRunning);
         return commandGenerator;
     } else {
+        isRunning=blocklyRunner.endRunning(isRunning);
         return null;
     }
 };
@@ -137,7 +148,7 @@ function runCode() {
             let gen = commandGenerator.next();
             if (!gen.done) tick = 0;
             else {
-                blocklyRunner.endRunning();
+                isRunning=blocklyRunner.endRunning(isRunning);
             }
         }
     }
