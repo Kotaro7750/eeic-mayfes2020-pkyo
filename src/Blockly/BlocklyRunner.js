@@ -69,6 +69,7 @@ class BlocklyRunner {
     
         this.workspace = Blockly.inject("blocklyDiv", options);
         console.log(this.workspace);
+        Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'), this.workspace);
 
         const executeButton = document.getElementById("executeButton");
         executeButton.onclick = startBlockly;
