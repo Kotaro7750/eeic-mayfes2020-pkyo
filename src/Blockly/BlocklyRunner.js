@@ -76,9 +76,18 @@ class BlocklyRunner {
     }
 
     
-    updateBlockly() {
+    updateBlockly(isRunning) {
         // 主に実行ボタンの描画更新（実行中/実行できるよ）の場所
         // ぶっちゃけボタンのclass変更してCSS変えるだけor画像切り替えるだけ
+        var element = document.getElementById( "executeButton" ) ;
+        console.log("!!!!!!!!!!!!!!")
+        if(isRunning){
+            element.className = "circle_running_btn";
+            element.innerHTML="■";
+        }else{
+            element.className = "circle_spread_btn";
+            element.innerHTML='<i class="fas fa-chevron-circle-left"></i>';
+        }
     }
 
     endRunning() {

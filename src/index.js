@@ -122,7 +122,7 @@ function startBlockly() {
             console.error(err);
         }
 
-        blocklyRunner.updateBlockly();
+        blocklyRunner.updateBlockly(isRunning);
         return commandGenerator;
     } else {
         return null;
@@ -137,7 +137,7 @@ function runCode() {
             let gen = commandGenerator.next();
             if (!gen.done) tick = 0;
             else {
-                endRunning();
+                blocklyRunner.endRunning();
             }
         }
     }
