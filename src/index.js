@@ -5,18 +5,82 @@ import tiles from "../public/stage/test/tilesets.png";
 import playerImg from "../public/stage/obake.png";
 import stageConfig from "./stage/test/config.json";
 
+
+class SceneTitle extends Phaser.Scene {
+    constructor() {
+        super({ key: 'SceneTitle', active: true });
+    }
+    create() {
+        var rect = new Phaser.Geom.Rectangle(250, 200, 300, 200);
+        var graphics = this.add.graphics({ fillStyle: { color: 0x0000ff } });
+        graphics.fillRectShape(rect);
+    }
+}
+
+class SceneGame extends Phaser.Scene {
+    
+    constructor() {
+        super({ key: 'SceneGame', active: false });
+    }
+
+    preload() {
+        // map
+        this.load.tilemapTiledJSON("map1", map1);
+        this.load.image("tiles", tiles);
+        // player
+        this.load.spritesheet("player", playerImg, {frameWidth: 32, frameHeight: 32});
+    }
+    
+    create() {
+        // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
+        mapDat = this.add.tilemap("map1");
+        let tileset = mapDat.addTilesetImage("tileset", "tiles");
+        this.backgroundLayer = mapDat.createDynamicLayer("ground", tileset);
+        map2Img = game.canvas.width / this.backgroundLayer.width;
+        this.backgroundLayer.setScale(map2Img);
+        mapDat = { ...mapDat, ...stageConfig };
+    
+        // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
+        // 実はmapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
+        let playerX = 5;
+        let playerY = 12;
+        player = this.add.sprite(mapDat.tileWidth * playerX * map2Img, mapDat.tileWidth * (playerY + 0.9) * map2Img, "player");
+        player.setOrigin(0, 1);
+        // †JSの闇†を使った定義
+        player.gridX = playerX;
+        player.gridY = playerY;
+        player.targetX = player.x;
+        player.targetY = player.y;
+    }
+    
+    update() {
+        // move: player.x += mapDat.tileWidth * map2Img * velocity;
+        // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
+        console.log(player.gridX, player.targetX, player.x)
+        if (player.targetX != player.x) {
+            const difX = player.targetX - player.x;
+            player.x += difX / Math.abs(difX) * 1;  // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
+        }
+        if (player.targetY != player.y) {
+            const difY = player.targetY - player.y;
+            player.y += difY / Math.abs(difY) * 1;
+        }
+        runCode(commandGenerator);
+    }
+}
+
+
 // TODO: 未検証ですが、setGameSizeを使うことでcanvasサイズが動的に変更できそうです→stage選択画面が窮屈にならずに済む
 const config = {
+    Extends: Phaser.Scene,
     type: Phaser.AUTO,
     width: 400,
     height: 600,
     parent: "phaserDiv",
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
+    scene: [SceneGame,SceneTitle]
 };
+
+
 
 // blocklyのdiv.style.leftを予め調整しておく
 const blocklyDiv = document.getElementById("blocklyDiv");
@@ -51,51 +115,6 @@ tick = 0;
 var player;
 var mapDat;
 var map2Img;
-
-function preload() {
-    // map
-    this.load.tilemapTiledJSON("map1", map1);
-    this.load.image("tiles", tiles);
-    // player
-    this.load.spritesheet("player", playerImg, {frameWidth: 32, frameHeight: 32});
-}
-
-function create() {
-    // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
-    mapDat = this.add.tilemap("map1");
-    let tileset = mapDat.addTilesetImage("tileset", "tiles");
-    this.backgroundLayer = mapDat.createDynamicLayer("ground", tileset);
-    map2Img = game.canvas.width / this.backgroundLayer.width;
-    this.backgroundLayer.setScale(map2Img);
-    mapDat = { ...mapDat, ...stageConfig };
-
-    // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
-    // 実はmapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
-    let playerX = 5;
-    let playerY = 12;
-    player = this.add.sprite(mapDat.tileWidth * playerX * map2Img, mapDat.tileWidth * (playerY + 0.9) * map2Img, "player");
-    player.setOrigin(0, 1);
-    // †JSの闇†を使った定義
-    player.gridX = playerX;
-    player.gridY = playerY;
-    player.targetX = player.x;
-    player.targetY = player.y;
-}
-
-function update() {
-    // move: player.x += mapDat.tileWidth * map2Img * velocity;
-    // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
-    console.log(player.gridX, player.targetX, player.x)
-    if (player.targetX != player.x) {
-        const difX = player.targetX - player.x;
-        player.x += difX / Math.abs(difX) * 1;  // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-    }
-    if (player.targetY != player.y) {
-        const difY = player.targetY - player.y;
-        player.y += difY / Math.abs(difY) * 1;
-    }
-    runCode(commandGenerator);
-}
 
 // class stageに入れたい
 function tryMove(player, dir) {
@@ -220,6 +239,7 @@ setBlockDefinition("move", function() {
 });
 
 // TODO: 大絶賛甘え中。ステージ増やすならpathで取ってくる関数実装してね♪
+
 const xmlStr = '<xml xmlns="">\
 <block type="loop"></block>\
 <block type="move"></block>\
