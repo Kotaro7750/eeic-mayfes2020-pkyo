@@ -1,12 +1,14 @@
 import Blockly from "blockly";
 import Phaser from "phaser";
 
+import StageRunner from "../stage/test/StageRunner";
+import BlocklyRunner from "../Blockly/BlocklyRunner.js";
+
 import map1 from "../../public/stage/test/tilemap.json";
 import tiles from "../../public/stage/test/tilesets.png";
 import playerImg from "../../public/stage/obake.png";
 
-import BlocklyRunner from "../Blockly/BlocklyRunner.js";
-import StageRunner from "../stage/test/StageRunner";
+//簡易ボタンを使う場合はコメントアウトを解除する
 //import SimpleButton from "../Objects/Objects.js";
 
 class SceneGame extends Phaser.Scene {
@@ -35,7 +37,20 @@ class SceneGame extends Phaser.Scene {
         this.stageRunner = new StageRunner();
         // blocklyrunner class
         this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
+        
+    }
 
+    preload() {
+        // この内容はStageRunner.loadに入れたいけど、出来ていない
+        // map
+        this.load.tilemapTiledJSON("map1", map1);
+        this.load.image("tiles", tiles);
+        // player
+        this.load.spritesheet("player", playerImg, {frameWidth: 32, frameHeight: 32});
+    }
+    
+    create() {
+        // stage固有ブロックの定義　stageの定義の方に移せると思う
         // stage option
         this.blocklyRunner.setBlockDefinition("move", function() {
             this.appendDummyInput()
@@ -57,19 +72,7 @@ class SceneGame extends Phaser.Scene {
             return `this.tryMove(this.player, ${dropdown_direction});\
                 yield true;\n`;
         });
-        
-    }
 
-    preload() {
-        // この内容はStageRunner.loadに入れたいけど、出来ていない
-        // map
-        this.load.tilemapTiledJSON("map1", map1);
-        this.load.image("tiles", tiles);
-        // player
-        this.load.spritesheet("player", playerImg, {frameWidth: 32, frameHeight: 32});
-    }
-    
-    create() {
         // blocklyのdiv.style.leftを予め調整しておく
         const blocklyDiv = document.getElementById("blocklyDiv");
         blocklyDiv.style.left = this.game.canvas.width;
@@ -136,10 +139,13 @@ class SceneGame extends Phaser.Scene {
     
             console.log(this.workspace);
             let code = Blockly.JavaScript.workspaceToCode(this.workspace);
-    
+
+            //ジェネレータに変換
+            code = "(function* () {" + code + "})";
+
             try {
                 console.log("code: ", code);
-                this.commandGenerator = eval("(function* () {" + code + "}).bind(this)()");
+                this.commandGenerator = eval(code).bind(this)();
             } catch(err) {
                 console.error(err);
             }
@@ -170,7 +176,7 @@ class SceneGame extends Phaser.Scene {
     }
 
 }
-//後で然るべき場所に移す
+
 class Player{
     constructor(){
         this.sprite;
