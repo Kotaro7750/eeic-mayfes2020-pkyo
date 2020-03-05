@@ -124,6 +124,7 @@ class SceneGame extends Phaser.Scene {
                 let gen = this.commandGenerator.next();
                 if (!gen.done) this.tick = 0;
                 else {
+                    this.isRunning = false;
                     this.blocklyRunner.endRunning();
                 }
             }
@@ -155,10 +156,12 @@ class SceneGame extends Phaser.Scene {
 
     tryMove(player, dir) {
         // ここはこれでいいの？ってなるけど
+        if(dir<0 || dir>=4) console.error("incorrect dir in tryMove()");
+
         const dx = [1, -1, 0, 0];
         const dy = [0, 0, -1, 1];
-        const nextGX = this.player.gridX + dx[dir];
-        const nextGY = this.player.gridY + dy[dir];
+        const nextGX = player.gridX + dx[dir];
+        const nextGY = player.gridY + dy[dir];
         if (this.mapDat.isWall[nextGY][nextGX]) return;
         else {
             player.targetX += dx[dir] * this.mapDat.tileWidth * this.map2Img;

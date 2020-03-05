@@ -1,22 +1,10 @@
 import Blockly from 'blockly';
 
 class BlocklyRunner {
-    //常に読み込むもの
     constructor(xmlFilePath) {
-        this.setBlockDefinition("loop", function() {
-            this.appendDummyInput()
-                .appendField("この中の内容を繰り返します");
-            this.appendStatementInput("LOOP");
-            this.setColour(360);
-            this.setTooltip("");
-            this.setHelpUrl("");
-        }, function(block) {
-            let code = Blockly.JavaScript.statementToCode(block, "LOOP");
-            return "while (true) {\n"
-                + "yield true;\n"
-                + code
-                + "}\n";
-        });
+        //ステージによらず常に読み込むブロックの定義を列挙する
+        this.setCommonBlockDefinition();
+
         this.xmlFilePath = xmlFilePath;
     }
 
@@ -37,6 +25,25 @@ class BlocklyRunner {
         Blockly.JavaScript[name] = (name) => {
             return conv(name);
         }
+    }
+
+    //ステージによらず常に読み込むブロックの定義を列挙する
+    //constructorの可読性に配慮し分離
+    setCommonBlockDefinition(){
+        this.setBlockDefinition("loop", function() {
+            this.appendDummyInput()
+                .appendField("この中の内容を繰り返します");
+            this.appendStatementInput("LOOP");
+            this.setColour(360);
+            this.setTooltip("");
+            this.setHelpUrl("");
+        }, function(block) {
+            let code = Blockly.JavaScript.statementToCode(block, "LOOP");
+            return "while (true) {\n"
+                + "yield true;\n"
+                + code
+                + "}\n";
+        });
     }
     
     async renderBlockly(startBlockly, maxBlocks) {
@@ -83,7 +90,6 @@ class BlocklyRunner {
     }
 
     endRunning() {
-        this.isRunning = false;
         this.updateBlockly();
     };
 };
