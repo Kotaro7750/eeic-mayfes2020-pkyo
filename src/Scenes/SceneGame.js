@@ -8,12 +8,17 @@ import playerImg from "../../public/stage/obake.png";
 import BlocklyRunner from "../Blockly/BlocklyRunner.js";
 import StageRunner from "../stage/test/StageRunner";
 
+import SceneTitle from "./SceneTitle.js";
+
 class SceneGame extends Phaser.Scene {
     
     constructor ()
     {
-        super();
-        
+        super({ key: 'game' });
+                
+        // 僕のblocklyに対するブチ切れ案件1
+        this.workspace;
+
         // game管理classのうちphaser持ち
         this.player;
         this.mapDat;
@@ -27,8 +32,14 @@ class SceneGame extends Phaser.Scene {
         // これらはgame管理classへ飛ばせる
         this.isRunning = false;
 
+        // stagerunner class
+        this.stageRunner = new StageRunner();
+        // blocklyrunner class
+        this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
+
+
         // stage option
-        blocklyRunner.setBlockDefinition("move", function() {
+        this.blocklyRunner.setBlockDefinition("move", function() {
             this.appendDummyInput()
             .appendField("Move")
             .appendField(new Blockly.FieldDropdown([
@@ -45,7 +56,7 @@ class SceneGame extends Phaser.Scene {
         }, function(block) {
             // TODO: ここ、blockをJSON.stringifyしてyieldの返り値で返せばhighlight出来る
             var dropdown_direction = block.getFieldValue('move_direction');
-            return `scene.tryMove(scene.player, ${dropdown_direction});\
+            return `this.tryMove(this.player, ${dropdown_direction});\
                 yield true;\n`;
         });
         
@@ -65,23 +76,24 @@ class SceneGame extends Phaser.Scene {
         const blocklyDiv = document.getElementById("blocklyDiv");
         blocklyDiv.style.left = this.game.canvas.width;
 
-        //blocklyを描画
-        blocklyRunner.renderBlockly(this)
+        //blocklyの描画設定(レンダリング)
+        this.blocklyRunner.renderBlockly(this)
             .then((space) => {
-                workspace = space;
+                this.workspace = space;
             });
+
         // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
         this.mapDat = this.add.tilemap("map1");
         let tileset = this.mapDat.addTilesetImage("tileset", "tiles");
         this.backgroundLayer = this.mapDat.createDynamicLayer("ground", tileset);
         this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
         this.backgroundLayer.setScale(this.map2Img);
-        this.mapDat = { ...this.mapDat, ...stageRunner.stageConfig };
+        this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
     
         // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
         // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
-        let playerX = stageRunner.stageConfig.playerX;
-        let playerY = stageRunner.stageConfig.playerY;
+        let playerX = this.stageRunner.stageConfig.playerX;
+        let playerY = this.stageRunner.stageConfig.playerY;
         this.player = this.add.sprite(this.mapDat.tileWidth * playerX * this.map2Img, this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img, "player");
         this.player.setOrigin(0, 1);
         // †JSの闇†を使った定義
@@ -89,10 +101,7 @@ class SceneGame extends Phaser.Scene {
         this.player.gridY = playerY;
         this.player.targetX = this.player.x;
         this.player.targetY = this.player.y;
-/*
-        var rect = new Phaser.Geom.Rectangle(150, 200, 200, 200);
-        var graphics = this.add.graphics({ fillStyle: { color: 0x0000ff } });
-        graphics.fillRectShape(rect);*/
+
     }
     
     update() {
@@ -116,7 +125,7 @@ class SceneGame extends Phaser.Scene {
                 let gen = this.commandGenerator.next();
                 if (!gen.done) this.tick = 0;
                 else {
-                    blocklyRunner.endRunning();
+                    this.blocklyRunner.endRunning();
                 }
             }
         }
@@ -127,17 +136,17 @@ class SceneGame extends Phaser.Scene {
         if (!this.isRunning) {
             this.isRunning = true;
     
-            console.log(workspace);
-            let code = Blockly.JavaScript.workspaceToCode(workspace);
+            console.log(this.workspace);
+            let code = Blockly.JavaScript.workspaceToCode(this.workspace);
     
             try {
                 console.log("code: ", code);
-                this.commandGenerator = eval("(function* (scene) {" + code + "})(this)");
+                this.commandGenerator = eval("(function* () {" + code + "}).bind(this)()");
             } catch(err) {
                 console.error(err);
             }
     
-            blocklyRunner.updateBlockly();
+            this.blocklyRunner.updateBlockly();
             return this.commandGenerator;
         } else {
             return null;
@@ -162,15 +171,5 @@ class SceneGame extends Phaser.Scene {
     }
 
 }
-
-// stagerunner class
-const stageRunner = new StageRunner();
-// blocklyrunner class
-const blocklyRunner = new BlocklyRunner(stageRunner.xmlFilePath);
-
-// 僕のblocklyに対するブチ切れ案件1
-var workspace;
-
-
 
 export default SceneGame;

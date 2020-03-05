@@ -1,6 +1,7 @@
 import Blockly from 'blockly';
 
 class BlocklyRunner {
+    //常に読み込むもの
     constructor(xmlFilePath) {
         this.setBlockDefinition("loop", function() {
             this.appendDummyInput()
@@ -12,8 +13,8 @@ class BlocklyRunner {
         }, function(block) {
             let code = Blockly.JavaScript.statementToCode(block, "LOOP");
             return "while (true) {\n"
-                + code
                 + "yield true;\n"
+                + code
                 + "}\n";
         });
         this.xmlFilePath = xmlFilePath;
