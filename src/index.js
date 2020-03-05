@@ -142,10 +142,11 @@ function startBlockly() {
 
 
 function runCode() {
-    console.log(commandGenerator);
+    //console.log(commandGenerator);
     if (isRunning) {
         if (++tick === cmdDelta) {
             let gen = commandGenerator.next();
+            workspace.highlightBlock(gen.value);
             if (!gen.done) tick = 0;
             else {
                 isRunning=blocklyRunner.endRunning(isRunning);
@@ -172,8 +173,9 @@ blocklyRunner.setBlockDefinition("move", function() {
 }, function(block) {
     // TODO: ここ、blockをJSON.stringifyしてyieldの返り値で返せばhighlight出来る
     var dropdown_direction = block.getFieldValue('move_direction');
+    console.log(block.id)
     return `tryMove(player, ${dropdown_direction});\
-        yield true;\n`;
+        yield "${block.id}";\n`;
 });
 
 // 僕のblocklyに対するブチ切れ案件1
