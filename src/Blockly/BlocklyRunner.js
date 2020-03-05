@@ -39,7 +39,7 @@ class BlocklyRunner {
         }
     }
     
-    async renderBlockly(scene, maxBlocks) {
+    async renderBlockly(startBlockly, maxBlocks) {
         console.log(this.xmlFilePath);
         let xmlFile = await this.getFile(this.xmlFilePath);
         console.log(xmlFile);
@@ -72,9 +72,7 @@ class BlocklyRunner {
         console.log(this.workspace);
 
         const executeButton = document.getElementById("executeButton");
-        executeButton.onclick = function(){
-            scene.startBlockly();
-        };
+        executeButton.onclick = startBlockly;
         return this.workspace;
     }
 

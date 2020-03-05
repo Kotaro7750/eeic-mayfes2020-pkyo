@@ -35,7 +35,6 @@ class SceneGame extends Phaser.Scene {
         // blocklyrunner class
         this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
 
-
         // stage option
         this.blocklyRunner.setBlockDefinition("move", function() {
             this.appendDummyInput()
@@ -75,7 +74,8 @@ class SceneGame extends Phaser.Scene {
         blocklyDiv.style.left = this.game.canvas.width;
 
         //blocklyの描画設定(レンダリング)
-        this.blocklyRunner.renderBlockly(this)
+        //コールバック関数を渡す時はちゃんとbindする
+        this.blocklyRunner.renderBlockly(this.startBlockly.bind(this))
             .then((space) => {
                 this.workspace = space;
             });
@@ -94,12 +94,12 @@ class SceneGame extends Phaser.Scene {
         let playerY = this.stageRunner.stageConfig.playerY;
         this.player.sprite = this.add.sprite(this.mapDat.tileWidth * playerX * this.map2Img, this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img, "player");
         this.player.sprite.setOrigin(0, 1);
-        // †JSの闇†を使った定義←JSの闇は祓われた
+        
+        // †JSの闇†を使った定義(JSの闇は祓われた)
         this.player.gridX = playerX;
         this.player.gridY = playerY;
         this.player.targetX = this.player.sprite.x;
         this.player.targetY = this.player.sprite.y;
-
     }
     
     update() {
@@ -130,7 +130,7 @@ class SceneGame extends Phaser.Scene {
     };
 
     startBlockly() {
-        console.log("start");
+        console.log("start blockly");
         if (!this.isRunning) {
             this.isRunning = true;
     
@@ -161,7 +161,6 @@ class SceneGame extends Phaser.Scene {
         if (this.mapDat.isWall[nextGY][nextGX]) return;
         else {
             player.targetX += dx[dir] * this.mapDat.tileWidth * this.map2Img;
-
             player.gridX = nextGX;
             player.targetY += dy[dir] * this.mapDat.tileHeight * this.map2Img;
             player.gridY = nextGY;
