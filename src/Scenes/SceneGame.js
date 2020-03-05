@@ -8,19 +8,17 @@ import playerImg from "../../public/stage/obake.png";
 import BlocklyRunner from "../Blockly/BlocklyRunner.js";
 import StageRunner from "../stage/test/StageRunner";
 
-import SceneTitle from "./SceneTitle.js";
-
 class SceneGame extends Phaser.Scene {
     
     constructor ()
     {
-        super({ key: 'game' });
+        super({ key: 'game'});
                 
         // 僕のblocklyに対するブチ切れ案件1
         this.workspace;
 
         // game管理classのうちphaser持ち
-        this.player;
+        this.player=new Player();
         this.mapDat;
         this.map2Img;
 
@@ -94,26 +92,26 @@ class SceneGame extends Phaser.Scene {
         // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
         let playerX = this.stageRunner.stageConfig.playerX;
         let playerY = this.stageRunner.stageConfig.playerY;
-        this.player = this.add.sprite(this.mapDat.tileWidth * playerX * this.map2Img, this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img, "player");
-        this.player.setOrigin(0, 1);
-        // †JSの闇†を使った定義
+        this.player.sprite = this.add.sprite(this.mapDat.tileWidth * playerX * this.map2Img, this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img, "player");
+        this.player.sprite.setOrigin(0, 1);
+        // †JSの闇†を使った定義←JSの闇は祓われた
         this.player.gridX = playerX;
         this.player.gridY = playerY;
-        this.player.targetX = this.player.x;
-        this.player.targetY = this.player.y;
+        this.player.targetX = this.player.sprite.x;
+        this.player.targetY = this.player.sprite.y;
 
     }
     
     update() {
-        // move: this.player.x += this.mapDat.tileWidth * this.map2Img * velocity;
+        // move: this.player.sprite.x += this.mapDat.tileWidth * this.map2Img * velocity;
         // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
-        if (this.player.targetX != this.player.x) {
-            const difX = this.player.targetX - this.player.x;
-            this.player.x += difX / Math.abs(difX) * 1;  // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
+        if (this.player.targetX != this.player.sprite.x) {
+            const difX = this.player.targetX - this.player.sprite.x;
+            this.player.sprite.x += difX / Math.abs(difX) * 1;  // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
         }
-        if (this.player.targetY != this.player.y) {
-            const difY = this.player.targetY - this.player.y;
-            this.player.y += difY / Math.abs(difY) * 1;
+        if (this.player.targetY != this.player.sprite.y) {
+            const difY = this.player.targetY - this.player.sprite.y;
+            this.player.sprite.y += difY / Math.abs(difY) * 1;
         }
         this.runCode(this.commandGenerator);
     }
@@ -170,6 +168,16 @@ class SceneGame extends Phaser.Scene {
         }
     }
 
+}
+//後で然るべき場所に移す
+class Player{
+    constructor(){
+        this.sprite;
+        this.gridX;
+        this.gridY;
+        this.targetX;
+        this.targetY;
+    }
 }
 
 export default SceneGame;

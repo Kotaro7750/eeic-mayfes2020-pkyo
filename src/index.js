@@ -16,3 +16,6 @@ const config = {
 window.onload = () => {
     var game = new Phaser.Game(config);
 }
+
+
+//index.jsには最小限のファイルだけ置きます

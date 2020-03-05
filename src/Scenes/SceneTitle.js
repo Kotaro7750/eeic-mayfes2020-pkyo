@@ -1,12 +1,10 @@
 import Phaser from "phaser";
 
-import SceneGame from "./SceneGame.js";
-
 class SceneTitle extends Phaser.Scene {
     
     constructor ()
     {
-        super({ key: 'title' });
+        super({ key: 'title'});
     }
 
     create(){
@@ -19,6 +17,7 @@ class SceneTitle extends Phaser.Scene {
     }
 }
 
+//後で然るべき場所に移す
 class SimpleButton{
     constructor(scene,x,y,width,height,buttonColor,text,textColor){
         var rect={x:x,y:y,width:width,height:height};
