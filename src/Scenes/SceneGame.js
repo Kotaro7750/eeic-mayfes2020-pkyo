@@ -7,6 +7,7 @@ import playerImg from "../../public/stage/obake.png";
 
 import BlocklyRunner from "../Blockly/BlocklyRunner.js";
 import StageRunner from "../stage/test/StageRunner";
+//import SimpleButton from "../Objects/Objects.js";
 
 class SceneGame extends Phaser.Scene {
     
