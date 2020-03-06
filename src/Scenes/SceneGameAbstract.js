@@ -4,17 +4,19 @@ import Phaser from "phaser";
 import StageRunner from "../stage/test/StageRunner";
 import BlocklyRunner from "../Blockly/BlocklyRunner.js";
 
-import map1 from "../../public/stage/test/tilemap.json";
-import tiles from "../../public/stage/test/tilesets.png";
 import playerImg from "../../public/stage/obake.png";
 
 //簡易ボタンを使う場合はコメントアウトを解除する
 //import SimpleButton from "../Objects/Objects.js";
 
-class SceneGame extends Phaser.Scene {
+class SceneGameAbstract extends Phaser.Scene {
+  init(data) {
+    this.loadedDataSrc.tilemap = import('../../public/stage/' + data.stage_dir + '/tilemap.json');
+    this.loadedDataSrc.tilesets = import('../../public/stage/' + data.stage_dir + '/tilesets.png');
+  }
 
   constructor() {
-    super({ key: 'game' });
+    super({ key: 'game-abstract' });
 
     // 僕のblocklyに対するブチ切れ案件1
     this.workspace;
@@ -37,14 +39,23 @@ class SceneGame extends Phaser.Scene {
     // blocklyrunner class
     this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
 
+    this.loadedDataSrc = {};
+
   }
 
   preload() {
     // この内容はStageRunner.loadに入れたいけど、出来ていない
     // map
-    this.load.tilemapTiledJSON("map1", map1);
-    this.load.image("tiles", tiles);
+    this.loadedDataSrc.tilemap.then(res => {
+      this.load.tilemapTiledJSON("map1", res.default);
+    });
+
+    this.loadedDataSrc.tilesets.then(res => {
+      this.load.image("tiles", res.default);
+    });
+
     // player
+    // TODO playerImgだけは動的importしてない
     this.load.spritesheet("player", playerImg, { frameWidth: 32, frameHeight: 32 });
   }
 
@@ -186,4 +197,4 @@ class Player {
   }
 }
 
-export default SceneGame;
+export default SceneGameAbstract;
