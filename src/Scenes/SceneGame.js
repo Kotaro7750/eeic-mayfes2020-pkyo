@@ -16,7 +16,7 @@ class SceneGame extends Phaser.Scene {
     constructor ()
     {
         super({ key: 'game'});
-                
+      　　
         // 僕のblocklyに対するブチ切れ案件1
         this.workspace;
 
@@ -51,6 +51,7 @@ class SceneGame extends Phaser.Scene {
     }
     
     create() {
+        //this.scene.launch('gameEffect'); //クリア時のエフェクト てきとう
         // stage固有ブロックの定義　stageの定義の方に移せると思う
         // stage option
         this.blocklyRunner.setBlockDefinition("move", function() {
@@ -158,6 +159,7 @@ class SceneGame extends Phaser.Scene {
             return null;
         }
     };
+  
     pauseBlockly() {
         //ポーズした時の処理を入れる
         if(!this.isRunning)return;
@@ -170,7 +172,6 @@ class SceneGame extends Phaser.Scene {
             element.innerHTML= "pause";
         }
     }
-
 
     tryMove(player, dir) {
         // ここはこれでいいの？ってなるけど
