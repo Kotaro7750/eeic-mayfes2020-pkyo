@@ -138,10 +138,11 @@ class SceneGame extends Phaser.Scene {
             //}.bind(this));
 
             //ボタンではなく画像を表示したい
+            //ゴールしてから時間差をつけて表示したい
             var button2 = new SimpleButton(this,150,200,150,50,0xfffff00,'clear',"green");
-            button2.button.on('pointerdown', function(){
+            //button2.button.on('pointerdown', function(){
                 //クリックしたら消えるなどの機能が欲しい
-            }.bind(this));
+            //}.bind(this));
             return;//returnよりも良い操作の終了方法があると思います。
         }
         this.runCode(this.commandGenerator);
