@@ -8,7 +8,7 @@ class SceneStageSelect extends Phaser.Scene {
   preload() { }
   create() {
 
-    this.add.text(0, 0, "Really Really\nCool\nStage Select", { fontSize: 50, color: "white" });
+    this.add.text(0, 0, "Very Very Cool\nStage Select", { fontSize: 50, color: "white" });
 
     //SimpleButtonは自作class ../Objects/Objects.js に記述している
     var stage0 = new SimpleButton(this, 50, 200, 200, 50, 0x0000ff, 'stage0', "red");

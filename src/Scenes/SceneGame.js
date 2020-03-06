@@ -180,13 +180,17 @@ class SceneGame extends Phaser.Scene {
     if (!this.isRunning) return;
     console.log("pause blockly");
     this.isPause = !this.isPause;
+    this.redrawPauseButton();
+  };
+
+  redrawPauseButton(){
     var element = document.getElementById("pauseButton");
     if (this.isPause) {
       element.innerHTML = 'restart';
     } else {
       element.innerHTML = "pause";
     }
-  };
+  }
 
   //playerの位置を初期位置に戻してruncode()を停止する
   reset() {
@@ -204,6 +208,8 @@ class SceneGame extends Phaser.Scene {
 
     //runcode()をストップする
     this.isRunning = false;
+    this.isPause = false;
+    this.redrawPauseButton();
     this.commandGenerator = null;
   }
 
