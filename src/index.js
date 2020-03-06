@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import SceneGame from "./Scenes/SceneGame.js/index.js";
+import SceneGame from "./Scenes/SceneGame.js";
 import SceneGameEffect from "./Scenes/SceneGameEffect.js";
 import SceneTitle from "./Scenes/SceneTitle.js";
 import SceneStageSelect from "./Scenes/SceneStageSelect.js";

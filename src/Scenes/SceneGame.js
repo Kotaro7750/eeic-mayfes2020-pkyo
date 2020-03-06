@@ -5,10 +5,9 @@ import StageRunner from "../stage/test/StageRunner";
 import BlocklyRunner from "../Blockly/BlocklyRunner.js";
 
 import playerImg from "../../public/stage/obake.png";
-import SceneGame from "./SceneGamex";
 
 //簡易ボタンを使う場合はコメントアウトを解除する
-//import SimpleButton from "../Objects/Objects.js";
+import SimpleButton from "../Objects/Objects.js";
 
 class SceneGame extends Phaser.Scene {
   init(data) {
@@ -116,6 +115,12 @@ class SceneGame extends Phaser.Scene {
     this.player.gridY = playerY;
     this.player.targetX = this.player.sprite.x;
     this.player.targetY = this.player.sprite.y;
+
+    //リセットボタン
+    var button_reset = new SimpleButton(this, 300, 0, 100, 30, 0x0000ff, 'reset', "red");
+    button_reset.button.on('pointerdown', function() {
+        this.reset();
+    }.bind(this));
   }
 
   update() {
@@ -182,24 +187,24 @@ class SceneGame extends Phaser.Scene {
       element.innerHTML = "pause";
     }
   };
-  
-    //playerの位置を初期位置に戻してruncode()を停止する
-    reset() {
-      console.log("reset");
 
-      let playerX = this.stageRunner.stageConfig.playerX;
-      let playerY = this.stageRunner.stageConfig.playerY;
-      this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
-      this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
+  //playerの位置を初期位置に戻してruncode()を停止する
+  reset() {
+    console.log("reset");
 
-      this.player.gridX = playerX;
-      this.player.gridY = playerY;
-      this.player.targetX = this.player.sprite.x;
-      this.player.targetY = this.player.sprite.y;
+    let playerX = this.stageRunner.stageConfig.playerX;
+    let playerY = this.stageRunner.stageConfig.playerY;
+    this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
+    this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
 
-      //runcode()をストップする
-      this.isRunning = false;
-      this.commandGenerator = null;
+    this.player.gridX = playerX;
+    this.player.gridY = playerY;
+    this.player.targetX = this.player.sprite.x;
+    this.player.targetY = this.player.sprite.y;
+
+    //runcode()をストップする
+    this.isRunning = false;
+    this.commandGenerator = null;
   }
 
   tryMove(player, dir) {
