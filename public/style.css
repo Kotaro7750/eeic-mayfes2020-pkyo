@@ -41,6 +41,13 @@ h1 {
   z-index: 1;
 }
 
+#pauseButton {
+  position: absolute;
+  left: 500px;
+  top: 550px;
+  z-index: 1;
+}
+
 .circle_spread_btn {
 	display: inline-block;
 	position: relative;

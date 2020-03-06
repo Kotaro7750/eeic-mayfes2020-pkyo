@@ -46,7 +46,7 @@ class BlocklyRunner {
         });
     }
     
-    async renderBlockly(startBlockly, maxBlocks) {
+    async renderBlockly(startBlockly,pauseBlockly,maxBlocks) {
         console.log(this.xmlFilePath);
         let xmlFile = await this.getFile(this.xmlFilePath);
         console.log(xmlFile);
@@ -81,6 +81,8 @@ class BlocklyRunner {
 
         const executeButton = document.getElementById("executeButton");
         executeButton.onclick = startBlockly;
+        const pauseButton = document.getElementById("pauseButton");
+        pauseButton.onclick = pauseBlockly;
         return this.workspace;
     }
 
@@ -88,14 +90,6 @@ class BlocklyRunner {
     updateBlockly(isRunning) {
         // 主に実行ボタンの描画更新（実行中/実行できるよ）の場所
         // ぶっちゃけボタンのclass変更してCSS変えるだけor画像切り替えるだけ
-        var element = document.getElementById( "executeButton" ) ;
-        if(isRunning){
-            element.className = "circle_running_btn";
-            element.innerHTML="■";
-        }else{
-            element.className = "circle_spread_btn";
-            element.innerHTML='<i class="fas fa-chevron-circle-left"></i>';
-        }
     }
 
     endRunning() {
