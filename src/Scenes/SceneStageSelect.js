@@ -16,7 +16,7 @@ class SceneStageSelect extends Phaser.Scene {
     //コールバックの指定
     stage0.button.on('pointerdown', function() {
       //シーンの遷移にエフェクトを加えたいならここの処理を変更する
-      this.scene.start('game-abstract', { stage_dir: "test" });
+      this.scene.start('game', { stage_dir: "test" });
     }.bind(this));
   }
   update() { }

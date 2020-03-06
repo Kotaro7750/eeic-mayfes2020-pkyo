@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import SceneGameAbstract from "./Scenes/SceneGameAbstract.js";
+import SceneGame from "./Scenes/SceneGame.js/index.js";
 import SceneGameEffect from "./Scenes/SceneGameEffect.js";
 import SceneTitle from "./Scenes/SceneTitle.js";
 import SceneStageSelect from "./Scenes/SceneStageSelect.js";
@@ -14,7 +14,7 @@ const config = {
   width: 400,
   height: 600,
   parent: "phaserDiv",
-  scene: [SceneTitle, SceneStageSelect, SceneGameAbstract, SceneGameEffect]
+  scene: [SceneTitle, SceneStageSelect, SceneGame, SceneGameEffect]
 };
 
 // initialize(この辺のvar/constはクラスでどっかに飛ばしたい)
