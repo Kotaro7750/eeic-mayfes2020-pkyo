@@ -67,10 +67,9 @@ class SceneGame extends Phaser.Scene {
             this.setTooltip("");
             this.setHelpUrl("");
         }, function(block) {
-            // TODO: ここ、blockをJSON.stringifyしてyieldの返り値で返せばhighlight出来る
             var dropdown_direction = block.getFieldValue('move_direction');
             return `this.tryMove(this.player, ${dropdown_direction});\
-                yield true;\n`;
+                yield "${block.id}";\n`;
         });
 
         // blocklyのdiv.style.leftを予め調整しておく
@@ -123,6 +122,7 @@ class SceneGame extends Phaser.Scene {
         if (this.isRunning) {
             if (++this.tick === this.cmdDelta) {
                 let gen = this.commandGenerator.next();
+                this.workspace.highlightBlock(gen.value);
                 if (!gen.done) this.tick = 0;
                 else {
                     this.isRunning = false;
