@@ -46,7 +46,7 @@ class BlocklyRunner {
         });
     }
     
-    async renderBlockly(startBlockly, maxBlocks) {
+    async renderBlockly(startBlockly,pauseBlockly,maxBlocks) {
         console.log(this.xmlFilePath);
         let xmlFile = await this.getFile(this.xmlFilePath);
         console.log(xmlFile);
@@ -77,14 +77,17 @@ class BlocklyRunner {
     
         this.workspace = Blockly.inject("blocklyDiv", options);
         console.log(this.workspace);
+        Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'), this.workspace);
 
         const executeButton = document.getElementById("executeButton");
         executeButton.onclick = startBlockly;
+        const pauseButton = document.getElementById("pauseButton");
+        pauseButton.onclick = pauseBlockly;
         return this.workspace;
     }
 
     
-    updateBlockly() {
+    updateBlockly(isRunning) {
         // 主に実行ボタンの描画更新（実行中/実行できるよ）の場所
         // ぶっちゃけボタンのclass変更してCSS変えるだけor画像切り替えるだけ
     }

@@ -41,6 +41,13 @@ h1 {
   z-index: 1;
 }
 
+#pauseButton {
+  position: absolute;
+  left: 500px;
+  top: 550px;
+  z-index: 1;
+}
+
 .circle_spread_btn {
 	display: inline-block;
 	position: relative;
@@ -77,6 +84,51 @@ h1 {
 	visibility: hidden;
 }
 .circle_spread_btn:hover::after {
+	 cursor: pointer;
+	 text-decoration: none;
+	 transition: transform .5s ease;
+	transform-origin: center;
+	transform: scale(1.4, 1.4);
+	opacity: 0.7;
+	visibility: visible;
+}
+
+.circle_running_btn {
+	display: inline-block;
+	position: relative;
+	width: 50px;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	text-decoration: none;
+	color: #fff;
+	background: #ff7700;
+	border-radius: 50%;
+}
+.circle_running_btn:hover {
+	 cursor: pointer;
+	 text-decoration: none;
+	text-align: center;
+	 transition: transform .3s;
+	transform-origin: center;
+	transform: scale(0.9, 0.9);
+	opacity: 0.7;
+}
+.circle_running_btn::after {
+    display: inline-block;
+    content: "";
+    width: 49px;
+    height: 49px;
+    position: absolute;
+	 border-radius: 50%;
+	color:#fff;
+	 top: -0.5px;
+	 left: -0.5px;
+    border: 1px solid #ff7700;
+	 transition: transform .5s ease;
+	visibility: hidden;
+}
+.circle_running_btn:hover::after {
 	 cursor: pointer;
 	 text-decoration: none;
 	 transition: transform .5s ease;

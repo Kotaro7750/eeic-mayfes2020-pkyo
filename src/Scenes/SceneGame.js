@@ -16,9 +16,7 @@ class SceneGame extends Phaser.Scene {
     constructor ()
     {
         super({ key: 'game'});
-        
-
-
+      　　
         // 僕のblocklyに対するブチ切れ案件1
         this.workspace;
 
@@ -34,6 +32,7 @@ class SceneGame extends Phaser.Scene {
 
         // これらはgame管理classへ飛ばせる
         this.isRunning = false;
+        this.isPause   = false;
 
         // stagerunner class
         this.stageRunner = new StageRunner();
@@ -70,10 +69,9 @@ class SceneGame extends Phaser.Scene {
             this.setTooltip("");
             this.setHelpUrl("");
         }, function(block) {
-            // TODO: ここ、blockをJSON.stringifyしてyieldの返り値で返せばhighlight出来る
             var dropdown_direction = block.getFieldValue('move_direction');
             return `this.tryMove(this.player, ${dropdown_direction});\
-                yield true;\n`;
+                yield "${block.id}";\n`;
         });
 
         // blocklyのdiv.style.leftを予め調整しておく
@@ -82,7 +80,7 @@ class SceneGame extends Phaser.Scene {
 
         //blocklyの描画設定(レンダリング)
         //コールバック関数を渡す時はちゃんとbindする
-        this.blocklyRunner.renderBlockly(this.startBlockly.bind(this))
+        this.blocklyRunner.renderBlockly(this.startBlockly.bind(this),this.pauseBlockly.bind(this))
             .then((space) => {
                 this.workspace = space;
             });
@@ -110,6 +108,7 @@ class SceneGame extends Phaser.Scene {
     }
     
     update() {
+        if (this.isPause)return;
         // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
         if (this.player.targetX != this.player.sprite.x) {
             const difX = this.player.targetX - this.player.sprite.x;
@@ -126,6 +125,7 @@ class SceneGame extends Phaser.Scene {
         if (this.isRunning) {
             if (++this.tick === this.cmdDelta) {
                 let gen = this.commandGenerator.next();
+                this.workspace.highlightBlock(gen.value);
                 if (!gen.done) this.tick = 0;
                 else {
                     this.isRunning = false;
@@ -159,7 +159,19 @@ class SceneGame extends Phaser.Scene {
             return null;
         }
     };
-
+  
+    pauseBlockly() {
+        //ポーズした時の処理を入れる
+        if(!this.isRunning)return;
+        console.log("pause blockly");
+        this.isPause=!this.isPause;
+        var element = document.getElementById( "pauseButton" ) ;
+        if(this.isPause){
+            element.innerHTML='restart';
+        }else{
+            element.innerHTML= "pause";
+        }
+    }
 
     tryMove(player, dir) {
         // ここはこれでいいの？ってなるけど
