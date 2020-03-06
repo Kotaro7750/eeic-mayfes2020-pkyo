@@ -12,7 +12,6 @@ import playerImg from "../../public/stage/obake.png";
 //import SimpleButton from "../Objects/Objects.js";
 
 class SceneGame extends Phaser.Scene {
-
   constructor() {
     super({ key: 'game' });
 
