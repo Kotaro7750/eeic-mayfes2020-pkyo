@@ -2,30 +2,29 @@ import Phaser from "phaser";
 import SimpleButton from "../Objects/Objects.js";
 
 class SceneTitle extends Phaser.Scene {
-    
-    constructor ()
-    {
-        super({ key: 'title'});
-    }
 
-    preload(){}
+  constructor() {
+    super({ key: 'title' });
+  }
 
-    create(){
-        this.add.text(0, 0, "Really\nReally\nCool Title", {fontSize: 50, color:"white"});
+  preload() { }
 
-        //SimpleButtonは自作class ../Objects/Objects.js に記述している
-        var button0 = new SimpleButton(this,50,200,200,50,0x0000ff,'start',"red");
-        var button1 = new SimpleButton(this,50,280,200,50,0xffff00,'dummy',"green");
-        var button2 = new SimpleButton(this,50,360,200,50,0x00ffff,'dummy',"blue");
+  create() {
+    this.add.text(0, 0, "Really\nReally\nCool Title", { fontSize: 50, color: "white" });
 
-        //コールバックの指定
-        button0.button.on('pointerdown', function(){
-            //シーンの遷移にエフェクトを加えたいならここの処理を変更する
-            this.scene.start('game');
-        }.bind(this));
-    }
+    //SimpleButtonは自作class ../Objects/Objects.js に記述している
+    var button0 = new SimpleButton(this, 50, 200, 200, 50, 0x0000ff, 'start', "red");
+    var button1 = new SimpleButton(this, 50, 280, 200, 50, 0xffff00, 'dummy', "green");
+    var button2 = new SimpleButton(this, 50, 360, 200, 50, 0x00ffff, 'dummy', "blue");
 
-    update(){}
+    //コールバックの指定
+    button0.button.on('pointerdown', function() {
+      //シーンの遷移にエフェクトを加えたいならここの処理を変更する
+      this.scene.start('stage-select');
+    }.bind(this));
+  }
+
+  update() { }
 }
 
 export default SceneTitle;
