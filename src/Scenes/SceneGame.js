@@ -9,19 +9,18 @@ import tiles from "../../public/stage/test/tilesets.png";
 import playerImg from "../../public/stage/obake.png";
 
 //簡易ボタンを使う場合はコメントアウトを解除する
-//import SimpleButton from "../Objects/Objects.js";
+import SimpleButton from "../Objects/Objects.js";
 
 class SceneGame extends Phaser.Scene {
-    
-    constructor ()
-    {
-        super({ key: 'game'});
-                
+
+    constructor() {
+        super({ key: 'game' });
+
         // 僕のblocklyに対するブチ切れ案件1
         this.workspace;
 
         // game管理classのうちphaser持ち
-        this.player=new Player();
+        this.player = new Player();
         this.mapDat;
         this.map2Img;
 
@@ -37,7 +36,7 @@ class SceneGame extends Phaser.Scene {
         this.stageRunner = new StageRunner();
         // blocklyrunner class
         this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
-        
+
     }
 
     preload() {
@@ -46,21 +45,21 @@ class SceneGame extends Phaser.Scene {
         this.load.tilemapTiledJSON("map1", map1);
         this.load.image("tiles", tiles);
         // player
-        this.load.spritesheet("player", playerImg, {frameWidth: 32, frameHeight: 32});
+        this.load.spritesheet("player", playerImg, { frameWidth: 32, frameHeight: 32 });
     }
-    
+
     create() {
         // stage固有ブロックの定義　stageの定義の方に移せると思う
         // stage option
         this.blocklyRunner.setBlockDefinition("move", function() {
             this.appendDummyInput()
-            .appendField("Move")
-            .appendField(new Blockly.FieldDropdown([
-                ["→", "0"],
-                ["←", "1"],
-                ["↑", "2"],
-                ["↓", "3"]
-            ]), "move_direction");
+                .appendField("Move")
+                .appendField(new Blockly.FieldDropdown([
+                    ["→", "0"],
+                    ["←", "1"],
+                    ["↑", "2"],
+                    ["↓", "3"]
+                ]), "move_direction");
             this.setNextStatement(true);
             this.setPreviousStatement(true);
             this.setColour(270);
@@ -90,27 +89,34 @@ class SceneGame extends Phaser.Scene {
         this.backgroundLayer = this.mapDat.createDynamicLayer("ground", tileset);
         this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
         this.backgroundLayer.setScale(this.map2Img);
-        this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
-    
+        this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig };
+
         // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
         // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
         let playerX = this.stageRunner.stageConfig.playerX;
         let playerY = this.stageRunner.stageConfig.playerY;
         this.player.sprite = this.add.sprite(this.mapDat.tileWidth * playerX * this.map2Img, this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img, "player");
         this.player.sprite.setOrigin(0, 1);
-        
+
         // †JSの闇†を使った定義(JSの闇は祓われた)
         this.player.gridX = playerX;
         this.player.gridY = playerY;
         this.player.targetX = this.player.sprite.x;
         this.player.targetY = this.player.sprite.y;
+
+        //リセットボタン
+        var button_reset = new SimpleButton(this, 300, 0, 100, 30, 0x0000ff, 'reset', "red");
+        button0.button.on('pointerdown', function() {
+            this.reset();
+        }.bind(this));
     }
-    
+
+
     update() {
         // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
         if (this.player.targetX != this.player.sprite.x) {
             const difX = this.player.targetX - this.player.sprite.x;
-            this.player.sprite.x += difX / Math.abs(difX) * 1;  // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
+            this.player.sprite.x += difX / Math.abs(difX) * 1; // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
         }
         if (this.player.targetY != this.player.sprite.y) {
             const difY = this.player.targetY - this.player.sprite.y;
@@ -136,7 +142,7 @@ class SceneGame extends Phaser.Scene {
         console.log("start blockly");
         if (!this.isRunning) {
             this.isRunning = true;
-    
+
             console.log(this.workspace);
             let code = Blockly.JavaScript.workspaceToCode(this.workspace);
 
@@ -146,28 +152,46 @@ class SceneGame extends Phaser.Scene {
             try {
                 console.log("code: ", code);
                 this.commandGenerator = eval(code).bind(this)();
-            } catch(err) {
+            } catch (err) {
                 console.error(err);
             }
-    
+
             this.blocklyRunner.updateBlockly();
             return this.commandGenerator;
         } else {
             return null;
         }
     };
+    //playerの位置を初期位置に戻してruncode()を停止する
+    reset() {
+        console.log("reset");
 
+        let playerX = this.stageRunner.stageConfig.playerX;
+        let playerY = this.stageRunner.stageConfig.playerY;
+        this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
+        this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
+
+        this.player.gridX = playerX;
+        this.player.gridY = playerY;
+        this.player.targetX = this.player.sprite.x;
+        this.player.targetY = this.player.sprite.y;
+
+        //runcode()をストップする
+        this.isRunning = false;
+        this.commandGenerator = null;
+    }
 
     tryMove(player, dir) {
         // ここはこれでいいの？ってなるけど
-        if(dir<0 || dir>=4) console.error("incorrect dir in tryMove()");
+        if (dir < 0 || dir >= 4) console.error("incorrect dir in tryMove()");
 
         const dx = [1, -1, 0, 0];
         const dy = [0, 0, -1, 1];
         const nextGX = player.gridX + dx[dir];
         const nextGY = player.gridY + dy[dir];
-        if (this.mapDat.isWall[nextGY][nextGX]) return;
-        else {
+        if (this.mapDat.isWall[nextGY][nextGX]) {
+            return;
+        } else {
             player.targetX += dx[dir] * this.mapDat.tileWidth * this.map2Img;
             player.gridX = nextGX;
             player.targetY += dy[dir] * this.mapDat.tileHeight * this.map2Img;
@@ -177,8 +201,8 @@ class SceneGame extends Phaser.Scene {
 
 }
 
-class Player{
-    constructor(){
+class Player {
+    constructor() {
         this.sprite;
         this.gridX;
         this.gridY;
