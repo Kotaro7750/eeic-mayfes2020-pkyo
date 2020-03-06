@@ -125,24 +125,18 @@ class SceneGame extends Phaser.Scene {
             this.player.sprite.y += difY / Math.abs(difY) * 1;
         }
         if(this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY){
-            //ここのコメントアウトはクリア処理もしようとして失敗した残骸
-            //var button = new SimpleButton(this,50,500,100,50,0xfffff00,'次へ',"green");
-            //var button1 = new SimpleButton(this,50,450,250,50,0x0000ff,'タイトルへ',"red");
-            //button.button.on('pointerdown', function(){
-                //ボタン押したら次のゲームが展開されるようにしたい
-            //    this.scene.start('次のゲーム');
-            //}.bind(this));
-            //button1.button.on('pointerdown', function(){
-                //このままでは前回の操作が残ってしまうので停止するor画面を初期化したい
-            //    this.scene.start('title');
-            //}.bind(this));
-
-            //ボタンではなく画像を表示したい
-            //ゴールしてから時間差をつけて表示したい
+            //ボタン類はゴールしてから時間差をつけて表示したい(setTimeoutが使えそう)
+            var button = new SimpleButton(this,50,500,100,50,0xfffff00,'次へ',"green");
+            var button1 = new SimpleButton(this,50,450,250,50,0x0000ff,'タイトルへ',"red");
             var button2 = new SimpleButton(this,150,200,150,50,0xfffff00,'clear',"green");
-            //button2.button.on('pointerdown', function(){
-                //クリックしたら消えるなどの機能が欲しい
-            //}.bind(this));
+            button.button.on('pointerdown', function(){
+                //ボタン押したら次のゲームが展開されるようにしたい
+                this.scene.start('次のゲーム');
+            }.bind(this));
+            button1.button.on('pointerdown', function(){
+                //このままでは前回の操作が残ってしまうので停止するor画面を初期化したい
+                this.scene.start('title');
+            }.bind(this));
             return;//returnよりも良い操作の終了方法があると思います。
         }
         this.runCode(this.commandGenerator);
