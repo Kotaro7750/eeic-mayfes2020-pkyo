@@ -7,6 +7,8 @@ import BlocklyRunner from "../Blockly/BlocklyRunner.js";
 import map1 from "../../public/stage/test/tilemap.json";
 import tiles from "../../public/stage/test/tilesets.png";
 import playerImg from "../../public/stage/obake.png";
+import goalImg from "../../public/stage/test/goaltest.png";
+import SimpleButton from "../Objects/Objects.js";
 
 //簡易ボタンを使う場合はコメントアウトを解除する
 //import SimpleButton from "../Objects/Objects.js";
@@ -22,6 +24,7 @@ class SceneGame extends Phaser.Scene {
 
         // game管理classのうちphaser持ち
         this.player=new Player();
+        this.goal = new Goal();
         this.mapDat;
         this.map2Img;
 
@@ -47,6 +50,7 @@ class SceneGame extends Phaser.Scene {
         this.load.image("tiles", tiles);
         // player
         this.load.spritesheet("player", playerImg, {frameWidth: 32, frameHeight: 32});
+        this.load.image("goal", goalImg);
     }
     
     create() {
@@ -96,6 +100,8 @@ class SceneGame extends Phaser.Scene {
         // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
         let playerX = this.stageRunner.stageConfig.playerX;
         let playerY = this.stageRunner.stageConfig.playerY;
+        let goalX = this.stageRunner.stageConfig.goalX;
+        let goalY = this.stageRunner.stageConfig.goalY;
         this.player.sprite = this.add.sprite(this.mapDat.tileWidth * playerX * this.map2Img, this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img, "player");
         this.player.sprite.setOrigin(0, 1);
         
@@ -104,17 +110,39 @@ class SceneGame extends Phaser.Scene {
         this.player.gridY = playerY;
         this.player.targetX = this.player.sprite.x;
         this.player.targetY = this.player.sprite.y;
+        this.goal.gridX = goalX;
+        this.goal.gridY = goalY;
     }
     
     update() {
         // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
-        if (this.player.targetX != this.player.sprite.x) {
+        if (this.player.targetX !== this.player.sprite.x) {
             const difX = this.player.targetX - this.player.sprite.x;
             this.player.sprite.x += difX / Math.abs(difX) * 1;  // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
         }
-        if (this.player.targetY != this.player.sprite.y) {
+        if (this.player.targetY !== this.player.sprite.y) {
             const difY = this.player.targetY - this.player.sprite.y;
             this.player.sprite.y += difY / Math.abs(difY) * 1;
+        }
+        if(this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY){
+            //ここのコメントアウトはクリア処理もしようとして失敗した残骸
+            //var button = new SimpleButton(this,50,500,100,50,0xfffff00,'次へ',"green");
+            //var button1 = new SimpleButton(this,50,450,250,50,0x0000ff,'タイトルへ',"red");
+            //button.button.on('pointerdown', function(){
+                //ボタン押したら次のゲームが展開されるようにしたい
+            //    this.scene.start('次のゲーム');
+            //}.bind(this));
+            //button1.button.on('pointerdown', function(){
+                //このままでは前回の操作が残ってしまうので停止するor画面を初期化したい
+            //    this.scene.start('title');
+            //}.bind(this));
+
+            //ボタンではなく画像を表示したい
+            var button2 = new SimpleButton(this,150,200,150,50,0xfffff00,'clear',"green");
+            button2.button.on('pointerdown', function(){
+                //クリックしたら消えるなどの機能が欲しい
+            }.bind(this));
+            return;//returnよりも良い操作の終了方法があると思います。
         }
         this.runCode(this.commandGenerator);
     }
@@ -184,6 +212,13 @@ class Player{
         this.gridY;
         this.targetX;
         this.targetY;
+    }
+}
+
+class Goal{
+    constructor(){
+        this.gridX;
+        this.gridY;
     }
 }
 
