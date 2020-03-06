@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import SceneGame from "./Scenes/SceneGame.js";
+import SceneGameEffect from "./Scenes/SceneGameEffect.js";
 import SceneTitle from "./Scenes/SceneTitle.js";
+
 
 // TODO: 未検証ですが、setGameSizeを使うことでcanvasサイズが動的に変更できそうです→stage選択画面が窮屈にならずに済む
 // sceneはリスト最初のものが自動実行されるらしい[要検証]
@@ -10,7 +12,7 @@ const config = {
     width: 400,
     height: 600,
     parent: "phaserDiv",
-    scene: [SceneTitle,SceneGame]
+    scene: [SceneTitle,SceneGame,SceneGameEffect]
 };
 
 // initialize(この辺のvar/constはクラスでどっかに飛ばしたい)
