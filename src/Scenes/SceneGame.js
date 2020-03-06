@@ -137,7 +137,7 @@ class SceneGame extends Phaser.Scene {
                 //このままでは前回の操作が残ってしまうので停止するor画面を初期化したい
                 this.scene.start('title');
             }.bind(this));
-            return;//ゴールについたら操作を狩猟したいのでとりあえずreturn。
+            return;//ゴールについたら操作を終了したいのでとりあえずreturn。
         }
         this.runCode(this.commandGenerator);
     }
