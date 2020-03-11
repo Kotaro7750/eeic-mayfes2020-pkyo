@@ -1,4 +1,6 @@
 .python-version
 node_modules/
 public/bundle.js
+.vscode
+.eslintrc.json
 .DS_Store

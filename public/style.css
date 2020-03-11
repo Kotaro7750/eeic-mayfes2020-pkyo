@@ -39,6 +39,7 @@ h1 {
   left: 420px;
   top: 550px;
   z-index: 1;
+  visibility:hidden;
 }
 
 #pauseButton {
@@ -46,6 +47,7 @@ h1 {
   left: 500px;
   top: 550px;
   z-index: 1;
+  visibility:hidden;
 }
 
 .circle_spread_btn {
