@@ -91,7 +91,7 @@ class SceneGame extends Phaser.Scene {
     // stage option
     this.blocklyRunner.setBlockDefinition("move", function() {
       this.appendDummyInput()
-        .appendField("Move")
+        .appendField("すすむ")
         .appendField(new Blockly.FieldDropdown([
           ["→", "0"],
           ["←", "1"],
