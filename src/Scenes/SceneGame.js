@@ -5,8 +5,7 @@ import StageRunner from "../stage/test/StageRunner";
 import BlocklyRunner from "../Blockly/BlocklyRunner.js";
 
 import playerImg from "../../public/stage/obake.png";
-
-//簡易ボタンを使う場合はコメントアウトを解除する
+import goalImg from "../../public/stage/test/goaltest.png";
 import SimpleButton from "../Objects/Objects.js";
 
 class SceneGame extends Phaser.Scene {
@@ -23,17 +22,26 @@ class SceneGame extends Phaser.Scene {
 
     // game管理classのうちphaser持ち
     this.player = new Player();
+    this.goal = new Goal();
     this.mapDat;
     this.map2Img;
 
     //コマンド生成用ジェネレータ
     this.commandGenerator;
-    this.cmdDelta = 45;
-    this.tick = 0;
+    this.cmdDelta;
+    this.tick;
 
     // これらはgame管理classへ飛ばせる
-    this.isRunning = false;
-    this.isPause = false;
+
+    // コードの実行中であるか
+    this.isRunning;
+    // ステージがクリア状態であるか
+    this.isCleared;
+    // コードの開始を行って良いか
+    this.isExecutable = true;
+
+    // ポーズ状態であるか
+    this.isPause;
 
     // stagerunner class
     this.stageRunner = new StageRunner();
@@ -58,9 +66,27 @@ class SceneGame extends Phaser.Scene {
     // player
     // TODO playerImgだけは動的importしてない
     this.load.spritesheet("player", playerImg, { frameWidth: 32, frameHeight: 32 });
+    this.load.image("goal", goalImg);
   }
 
   create() {
+    
+    this.game.scale.setGameSize(400, 600);
+
+    //変数の初期化(再start時に勝手に初期化してくれない？ので)
+    this.commandGenerator=null;
+    //cmdDeltaは命令実行毎に書き換わるようにした
+    this.cmdDelta = 1;
+    this.tick = 0;
+    this.isRunning = false;
+    this.isPause = false;
+    this.isCleared = false;
+    this.isExecutable = true;
+
+    //htmlボタンを可視化する
+    document.getElementById("executeButton").style.visibility="visible";
+    document.getElementById("pauseButton").style.visibility="visible";
+
     // stage固有ブロックの定義　stageの定義の方に移せると思う
     // stage option
     this.blocklyRunner.setBlockDefinition("move", function() {
@@ -81,6 +107,7 @@ class SceneGame extends Phaser.Scene {
       // TODO: ここ、blockをJSON.stringifyしてyieldの返り値で返せばhighlight出来る
       var dropdown_direction = block.getFieldValue('move_direction');
       return `this.tryMove(this.player, ${dropdown_direction});\
+                this.cmdDelta=35;\
                 yield true;\n`;
     });
 
@@ -107,6 +134,8 @@ class SceneGame extends Phaser.Scene {
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
     let playerX = this.stageRunner.stageConfig.playerX;
     let playerY = this.stageRunner.stageConfig.playerY;
+    let goalX = this.stageRunner.stageConfig.goalX;
+    let goalY = this.stageRunner.stageConfig.goalY;
     this.player.sprite = this.add.sprite(this.mapDat.tileWidth * playerX * this.map2Img, this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img, "player");
     this.player.sprite.setOrigin(0, 1);
 
@@ -115,45 +144,89 @@ class SceneGame extends Phaser.Scene {
     this.player.gridY = playerY;
     this.player.targetX = this.player.sprite.x;
     this.player.targetY = this.player.sprite.y;
+    this.goal.gridX = goalX;
+    this.goal.gridY = goalY;
 
     //リセットボタン
-    var button_reset = new SimpleButton(this, 300, 0, 100, 30, 0x0000ff, 'reset', "red");
+    var button_reset = new SimpleButton(this, 300, 0, 100, 30, 0x7f7fff, 'reset', "blue");
     button_reset.button.on('pointerdown', function() {
         this.reset();
+    }.bind(this));
+    //ステージセレクトに戻る
+    var button_back = new SimpleButton(this, 0, 0, 100, 30, 0x7fff7f, 'back', "green");
+    button_back.button.on('pointerdown', function() {
+        this.exitScene();
+        this.scene.start('stage-select');
     }.bind(this));
   }
 
   update() {
     if (this.isPause) return;
+    if (this.isRunning) this.updateOnRunning();
+  }
+
+  //実行中の処理を行うパート
+  updateOnRunning(){
     // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
-    if (this.player.targetX != this.player.sprite.x) {
+    if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       this.player.sprite.x += difX / Math.abs(difX) * 1;  // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
     }
-    if (this.player.targetY != this.player.sprite.y) {
+    if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
       this.player.sprite.y += difY / Math.abs(difY) * 1;
     }
-    this.runCode(this.commandGenerator);
-  }
+    if (++this.tick === this.cmdDelta) {
+      this.tick = 0;
+      //runCodeとゴール判定を同じタイミングで行うことで、移動が完了してから(正確には次のコードを受理できるタイミングになってから)ゴール判定がなされるようにした
+      //ゴール判定を満たすならばゴール処理
+      //そうでなければ通常の処理
+      if(this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY){
 
-  runCode() {
-    if (this.isRunning) {
-      if (++this.tick === this.cmdDelta) {
+        var button = new SimpleButton(this,50,500,100,50,0x7fff7f,'次へ',"green");
+        var buttonT = new SimpleButton(this,50,550,250,50,0xff7f7f,'タイトルへ',"red");
+        var buttonS = new SimpleButton(this,50,450,250,50,0x7f7fff,'ステージ',"blue");
+        //ボタンを消す処理等が整備されていないため、clear後のリセットができない
+        //var buttonR = new SimpleButton(this,50,400,250,50,0xff7fff,'やりなおす',"purple");
+        var button2 = new SimpleButton(this,50,200,300,50,0xfffff00,'Game Clear',"green");
+        button.button.on('pointerdown', function(){
+            //ボタン押したら次のゲームが展開されるようにしたい
+            this.exitScene();
+            this.scene.start('次のゲーム');
+        }.bind(this));
+        buttonS.button.on('pointerdown', function(){
+          this.exitScene();
+          this.scene.start('stage-select');
+        }.bind(this));
+        buttonT.button.on('pointerdown', function(){
+          this.exitScene();
+          this.scene.start('title');
+        }.bind(this));
+        /*
+        buttonR.button.on('pointerdown', function(){
+          this.isCleared=false;
+          this.reset();
+        }.bind(this));
+*/
+        this.isCleared=true;
+        this.isRunning=false;
+      }
+      else{
         let gen = this.commandGenerator.next();
-        if (!gen.done) this.tick = 0;
-        else {
+        if (gen.done){
           this.isRunning = false;
           this.blocklyRunner.endRunning();
         }
       }
     }
-  };
-
+    if (this.tick > this.cmdDelta)console.error("Scene Game: tick exceeded cmdDelta");
+  }
+ 
   startBlockly() {
     console.log("start blockly");
-    if (!this.isRunning) {
-      this.isRunning = true;
+    if (this.isExecutable) {
+      this.isExecutable = false;
+      this.isRunning=true;
 
       console.log(this.workspace);
       let code = Blockly.JavaScript.workspaceToCode(this.workspace);
@@ -186,35 +259,48 @@ class SceneGame extends Phaser.Scene {
   redrawPauseButton(){
     var element = document.getElementById("pauseButton");
     if (this.isPause) {
-      element.innerHTML = 'restart';
+      element.innerHTML = "restart";
     } else {
       element.innerHTML = "pause";
     }
-  }
+  };
 
-  //playerの位置を初期位置に戻してruncode()を停止する
+  //playerの位置を初期位置に戻す
   reset() {
     console.log("reset");
+    if (!this.isCleared){
+      let playerX = this.stageRunner.stageConfig.playerX;
+      let playerY = this.stageRunner.stageConfig.playerY;
+      this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
+      this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
 
-    let playerX = this.stageRunner.stageConfig.playerX;
-    let playerY = this.stageRunner.stageConfig.playerY;
-    this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
-    this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
+      this.player.gridX = playerX;
+      this.player.gridY = playerY;
+      this.player.targetX = this.player.sprite.x;
+      this.player.targetY = this.player.sprite.y;
 
-    this.player.gridX = playerX;
-    this.player.gridY = playerY;
-    this.player.targetX = this.player.sprite.x;
-    this.player.targetY = this.player.sprite.y;
+      this.isRunning = false;
+      this.isPause = false;
+      this.isExecutable = true;
 
-    //runcode()をストップする
-    this.isRunning = false;
-    this.isPause = false;
-    this.redrawPauseButton();
-    this.commandGenerator = null;
-  }
+      this.redrawPauseButton();
+      this.commandGenerator = null;
+    }
+  };
 
+
+  //シーンを終了する時は必ずこの関数を通ること
+  exitScene(){
+    this.workspace.dispose();
+    this.workspace=null;
+    document.getElementById("executeButton").style.visibility="hidden";
+    document.getElementById("pauseButton").style.visibility="hidden";
+    document.getElementById("executeButton").onclick=null;
+    document.getElementById("pauseButton").onclick=null;
+  };
+
+  //ここに置くべきかどうか考えておく
   tryMove(player, dir) {
-    // ここはこれでいいの？ってなるけど
     if (dir < 0 || dir >= 4) console.error("incorrect dir in tryMove()");
 
     const dx = [1, -1, 0, 0];
@@ -228,7 +314,7 @@ class SceneGame extends Phaser.Scene {
       player.targetY += dy[dir] * this.mapDat.tileHeight * this.map2Img;
       player.gridY = nextGY;
     }
-  }
+  };
 
 }
 
@@ -240,6 +326,13 @@ class Player {
     this.targetX;
     this.targetY;
   }
+}
+
+class Goal{
+    constructor(){
+        this.gridX;
+        this.gridY;
+    }
 }
 
 export default SceneGame;
