@@ -20,6 +20,7 @@ const config = {
 
 // initialize(この辺のvar/constはクラスでどっかに飛ばしたい)
 window.onload = () => {
+  // eslint-disable-next-line no-unused-vars
   const game = new Phaser.Game(config);
 };
 

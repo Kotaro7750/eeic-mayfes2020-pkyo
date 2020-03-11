@@ -6,17 +6,14 @@
   "dependencies": {
     "blockly": "^3.20200123.1",
     "file-loader": "^5.1.0",
-    "html-webpack-plugin": "^3.2.0",
     "phaser": "^3.22.0",
-    "raw-loader": "^4.0.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
   },
   "devDependencies": {
-    "clean-webpack-plugin": "^3.0.0",
     "eslint": "^6.8.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-react": "^7.19.0",
+    "babel-eslint": "^10.1.0",
     "webpack-dev-server": "^3.10.3"
   },
   "scripts": {
