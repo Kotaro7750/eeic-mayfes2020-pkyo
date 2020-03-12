@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import StageRunner from '../stage/test/StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import playerImg from '../../public/stage/obake.png';
+import playerImg from '../stage/obake.png';
 import SimpleButton from '../Objects/Objects.js';
 
 const enumExecModePre = 1;
@@ -16,14 +16,14 @@ const enumExecModeClear = 5;
 
 class SceneGame extends Phaser.Scene {
   init(data) {
-    this.loadedDataSrc.tilemap = import('../../public/stage/' + data.stage_dir + '/tilemap.json');
-    this.loadedDataSrc.tilesets = import('../../public/stage/' + data.stage_dir + '/tilesets.png');
-    this.blockDefs = import('../../public/stage/' + data.stage_dir + '/Blocks.json');
-    this.blockFuncs = import('../../public/stage/' + data.stage_dir + '/Blocks.js');
+    this.loadedDataSrc.tilemap = import('../stage/' + data.stage_dir + '/tilemap.json');
+    this.loadedDataSrc.tilesets = import('../stage/' + data.stage_dir + '/tilesets.png');
+    this.blockDefs = import('../stage/' + data.stage_dir + '/Blocks.json');
+    this.blockFuncs = import('../stage/' + data.stage_dir + '/Blocks.js');
   }
 
   constructor() {
-    super({key: 'game'});
+    super({ key: 'game' });
 
     this.workspace;
 
@@ -63,7 +63,7 @@ class SceneGame extends Phaser.Scene {
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('player', playerImg, { frameWidth: 32, frameHeight: 32 });
   }
 
   create() {
@@ -88,9 +88,9 @@ class SceneGame extends Phaser.Scene {
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
     this.blocklyRunner.renderBlockly(this.startBlockly.bind(this), this.pauseBlockly.bind(this))
-        .then((space) => {
-          this.workspace = space;
-        });
+      .then((space) => {
+        this.workspace = space;
+      });
 
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
@@ -99,7 +99,7 @@ class SceneGame extends Phaser.Scene {
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
     this.backgroundLayer.setScale(this.map2Img);
-    this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
+    this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
@@ -111,7 +111,7 @@ class SceneGame extends Phaser.Scene {
     // リセットボタン
     const buttonReset = new SimpleButton(this, 300, 0, 100, 30, 0x7f7fff, 'reset', 'blue');
     buttonReset.button.on('pointerdown', function() {
-      if (this.execMode!==enumExecModeClear) {
+      if (this.execMode !== enumExecModeClear) {
         this.initGameField();
       }
     }.bind(this));
@@ -124,7 +124,7 @@ class SceneGame extends Phaser.Scene {
   }
 
   update() {
-    if (this.execMode===enumExecModeRun) this.updateOnRunning();
+    if (this.execMode === enumExecModeRun) this.updateOnRunning();
   }
 
   // 実行中の処理を行うパート
@@ -168,11 +168,11 @@ class SceneGame extends Phaser.Scene {
           this.scene.start('title');
         }.bind(this));
 
-        this.execMode=enumExecModeClear;
+        this.execMode = enumExecModeClear;
       } else {
         const gen = this.commandGenerator.next();
         if (gen.done) {
-          this.execMode=enumExecModeDone;
+          this.execMode = enumExecModeDone;
           this.blocklyRunner.endRunning();
         }
       }
@@ -184,8 +184,8 @@ class SceneGame extends Phaser.Scene {
 
   startBlockly() {
     console.log('start blockly');
-    if (this.execMode===enumExecModePre) {
-      this.execMode=enumExecModeRun;
+    if (this.execMode === enumExecModePre) {
+      this.execMode = enumExecModeRun;
 
       console.log(this.workspace);
       let code = Blockly.JavaScript.workspaceToCode(this.workspace);
@@ -210,17 +210,17 @@ class SceneGame extends Phaser.Scene {
   pauseBlockly() {
     // ポーズした時の処理を入れる
     console.log('pause blockly');
-    if (this.execMode===enumExecModeRun) {
-      this.execMode=enumExecModePause;
-    } else if (this.execMode===enumExecModePause) {
-      this.execMode=enumExecModeRun;
+    if (this.execMode === enumExecModeRun) {
+      this.execMode = enumExecModePause;
+    } else if (this.execMode === enumExecModePause) {
+      this.execMode = enumExecModeRun;
     }
     this.redrawPauseButton();
   };
 
   redrawPauseButton() {
     const element = document.getElementById('pauseButton');
-    if (this.execMode===enumExecModePause) {
+    if (this.execMode === enumExecModePause) {
       element.innerHTML = 'restart';
     } else {
       element.innerHTML = 'pause';
@@ -247,7 +247,7 @@ class SceneGame extends Phaser.Scene {
     this.goal.gridX = goalX;
     this.goal.gridY = goalY;
 
-    this.execMode=enumExecModePre;
+    this.execMode = enumExecModePre;
 
     this.redrawPauseButton();
     this.commandGenerator = null;
@@ -302,4 +302,3 @@ class Goal {
 }
 
 export default SceneGame;
-
