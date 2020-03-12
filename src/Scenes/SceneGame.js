@@ -5,21 +5,26 @@ import StageRunner from '../stage/test/StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
 import playerImg from '../../public/stage/obake.png';
-import playerImg1 from '../../public/stage/obake2.png';
-import playerImg2 from '../../public/stage/obake3.png';
-import playerImg3 from '../../public/stage/obake4.png';
 import SimpleButton from '../Objects/Objects.js';
+
+const enumExecModePre = 1;
+const enumExecModeRun = 2;
+const enumExecModePause = 3;
+const enumExecModeDone = 4;
+const enumExecModeClear = 5;
+
 
 class SceneGame extends Phaser.Scene {
   init(data) {
-    this.loadedDataSrc.tilemap = import('../../public/stage/' + data.stage_dir + '/tilemap.json');
-    this.loadedDataSrc.tilesets = import('../../public/stage/' + data.stage_dir + '/tilesets.png');
+    this.loadedDataSrc.tilemap =
+      import('../../public/stage/' + data.stage_dir + '/tilemap.json');
+    this.loadedDataSrc.tilesets =
+      import('../../public/stage/' + data.stage_dir + '/tilesets.png');
   }
 
   constructor() {
     super({key: 'game'});
 
-    // 僕のblocklyに対するブチ切れ案件1
     this.workspace;
 
     // game管理classのうちphaser持ち
@@ -33,17 +38,7 @@ class SceneGame extends Phaser.Scene {
     this.cmdDelta;
     this.tick;
 
-    // これらはgame管理classへ飛ばせる
-
-    // コードの実行中であるか
-    this.isRunning;
-    // ステージがクリア状態であるか
-    this.isCleared;
-    // コードの開始を行って良いか
-    this.isExecutable = true;
-
-    // ポーズ状態であるか
-    this.isPause;
+    this.execMode;
 
     // stagerunner class
     this.stageRunner = new StageRunner();
@@ -71,17 +66,6 @@ class SceneGame extends Phaser.Scene {
 
   create() {
     this.game.scale.setGameSize(400, 600);
-
-    // 変数の初期化(再start時に勝手に初期化してくれない？ので)
-    this.commandGenerator=null;
-    // cmdDeltaは命令実行毎に書き換わるようにした
-    this.cmdDelta = 1;
-    this.tick = 0;
-    this.isRunning = false;
-    this.isPause = false;
-    this.isCleared = false;
-    this.isExecutable = true;
-
     // htmlボタンを可視化する
     document.getElementById('executeButton').style.visibility='visible';
     document.getElementById('pauseButton').style.visibility='visible';
@@ -135,28 +119,17 @@ class SceneGame extends Phaser.Scene {
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
-    const playerX = this.stageRunner.stageConfig.playerX;
-    const playerY = this.stageRunner.stageConfig.playerY;
-    const goalX = this.stageRunner.stageConfig.goalX;
-    const goalY = this.stageRunner.stageConfig.goalY;
-    this.player.sprite = this.add.sprite(
-        this.mapDat.tileWidth * playerX * this.map2Img,
-        this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img,
-        'player');
+    this.player.sprite = this.add.sprite(0, 0, 'player');
     this.player.sprite.setOrigin(0, 1);
-
-
-    this.player.gridX = playerX;
-    this.player.gridY = playerY;
-    this.player.targetX = this.player.sprite.x;
-    this.player.targetY = this.player.sprite.y;
-    this.goal.gridX = goalX;
-    this.goal.gridY = goalY;
+    // プレイヤーの位置等の初期化処理をしている
+    this.initGameField();
 
     // リセットボタン
     const buttonReset = new SimpleButton(this, 300, 0, 100, 30, 0x7f7fff, 'reset', 'blue');
     buttonReset.button.on('pointerdown', function() {
-      this.reset();
+      if (this.execMode!==enumExecModeClear) {
+        this.initGameField();
+      }
     }.bind(this));
     // ステージセレクトに戻る
     const buttonBack = new SimpleButton(this, 0, 0, 100, 30, 0x7fff7f, 'back', 'green');
@@ -167,8 +140,7 @@ class SceneGame extends Phaser.Scene {
   }
 
   update() {
-    if (this.isPause) return;
-    if (this.isRunning) this.updateOnRunning();
+    if (this.execMode===enumExecModeRun) this.updateOnRunning();
   }
 
   // 実行中の処理を行うパート
@@ -177,14 +149,14 @@ class SceneGame extends Phaser.Scene {
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      if(difX > 0) this.player.sprite.setFrame(6);
-      else if(difX < 0) this.player.sprite.setFrame(3);
+      if (difX > 0) this.player.sprite.setFrame(6);
+      else if (difX < 0) this.player.sprite.setFrame(3);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
     if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
-      if(difY > 0) this.player.sprite.setFrame(9);
-      else if(difY < 0) this.player.sprite.setFrame(0);
+      if (difY > 0) this.player.sprite.setFrame(9);
+      else if (difY < 0) this.player.sprite.setFrame(0);
       this.player.sprite.y += difY / Math.abs(difY) * 1;
     }
     if (++this.tick === this.cmdDelta) {
@@ -196,8 +168,6 @@ class SceneGame extends Phaser.Scene {
         const button = new SimpleButton(this, 50, 500, 100, 50, 0x7fff7f, '次へ', 'green');
         const buttonT = new SimpleButton(this, 50, 550, 250, 50, 0xff7f7f, 'タイトルへ', 'red');
         const buttonS = new SimpleButton(this, 50, 450, 250, 50, 0x7f7fff, 'ステージ', 'blue');
-        // ボタンを消す処理等が整備されていないため、clear後のリセットができない
-        // var buttonR = new SimpleButton(this,50,400,250,50,0xff7fff,'やりなおす','purple');
         // eslint-disable-next-line no-unused-vars
         const button2 = new SimpleButton(this, 50, 200, 300, 50, 0xfffff00, 'Game Clear', 'green');
         button.button.on('pointerdown', function() {
@@ -213,18 +183,12 @@ class SceneGame extends Phaser.Scene {
           this.exitScene();
           this.scene.start('title');
         }.bind(this));
-        /*
-        buttonR.button.on('pointerdown', function(){
-          this.isCleared=false;
-          this.reset();
-        }.bind(this));
-*/
-        this.isCleared=true;
-        this.isRunning=false;
+
+        this.execMode=enumExecModeClear;
       } else {
         const gen = this.commandGenerator.next();
         if (gen.done) {
-          this.isRunning = false;
+          this.execMode=enumExecModeDone;
           this.blocklyRunner.endRunning();
         }
       }
@@ -236,9 +200,8 @@ class SceneGame extends Phaser.Scene {
 
   startBlockly() {
     console.log('start blockly');
-    if (this.isExecutable) {
-      this.isExecutable = false;
-      this.isRunning=true;
+    if (this.execMode===enumExecModePre) {
+      this.execMode=enumExecModeRun;
 
       console.log(this.workspace);
       let code = Blockly.JavaScript.workspaceToCode(this.workspace);
@@ -262,15 +225,18 @@ class SceneGame extends Phaser.Scene {
 
   pauseBlockly() {
     // ポーズした時の処理を入れる
-    if (!this.isRunning) return;
     console.log('pause blockly');
-    this.isPause = !this.isPause;
+    if (this.execMode===enumExecModeRun) {
+      this.execMode=enumExecModePause;
+    } else if (this.execMode===enumExecModePause) {
+      this.execMode=enumExecModeRun;
+    }
     this.redrawPauseButton();
   };
 
   redrawPauseButton() {
     const element = document.getElementById('pauseButton');
-    if (this.isPause) {
+    if (this.execMode===enumExecModePause) {
       element.innerHTML = 'restart';
     } else {
       element.innerHTML = 'pause';
@@ -278,27 +244,31 @@ class SceneGame extends Phaser.Scene {
   };
 
   // playerの位置を初期位置に戻す
-  // TODO: ここ冗長そう（constructorと同様の処理を書くのはアです）
-  reset() {
-    console.log('reset');
-    if (!this.isCleared) {
-      const playerX = this.stageRunner.stageConfig.playerX;
-      const playerY = this.stageRunner.stageConfig.playerY;
-      this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
-      this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
+  // TODO: ここ冗長そう（constructorと同様の処理を書くのはアです）←まとめました
+  initGameField() {
+    console.log('initGameField');
 
-      this.player.gridX = playerX;
-      this.player.gridY = playerY;
-      this.player.targetX = this.player.sprite.x;
-      this.player.targetY = this.player.sprite.y;
+    const playerX = this.stageRunner.stageConfig.playerX;
+    const playerY = this.stageRunner.stageConfig.playerY;
+    const goalX = this.stageRunner.stageConfig.goalX;
+    const goalY = this.stageRunner.stageConfig.goalY;
 
-      this.isRunning = false;
-      this.isPause = false;
-      this.isExecutable = true;
+    this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
+    this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
 
-      this.redrawPauseButton();
-      this.commandGenerator = null;
-    }
+    this.player.gridX = playerX;
+    this.player.gridY = playerY;
+    this.player.targetX = this.player.sprite.x;
+    this.player.targetY = this.player.sprite.y;
+    this.goal.gridX = goalX;
+    this.goal.gridY = goalY;
+
+    this.execMode=enumExecModePre;
+
+    this.redrawPauseButton();
+    this.commandGenerator = null;
+    this.cmdDelta = 1;
+    this.tick = 0;
   };
 
 
@@ -348,3 +318,4 @@ class Goal {
 }
 
 export default SceneGame;
+
