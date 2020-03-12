@@ -143,11 +143,17 @@ class SceneGame extends Phaser.Scene {
         (this.mapDat.tileWidth + 1) * playerY * this.map2Img,
         'player');
     this.player.sprite.setOrigin(0, 1);
-    //ここでアニメーションの定義(187行目のようにthis.player.sprite.anims.play('right', true);でこのアニメーションを実行できる)
+    //ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)
     //これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
     this.player.sprite.scene.anims.create({
       key: 'right',
       frames:this.player.sprite.scene.anims.generateFrameNumbers('player', { frames:[ 5, 6, 7, 8] }),
+      frameRate: 10,
+      repeat: -1
+    });
+    this.player.sprite.scene.anims.create({
+      key: 'left',
+      frames:this.player.sprite.scene.anims.generateFrameNumbers('player', { frames:[ 0, 1, 2, 3] }),
       frameRate: 10,
       repeat: -1
     });
@@ -185,7 +191,7 @@ class SceneGame extends Phaser.Scene {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
       if(difX > 0) this.player.sprite.anims.play('right', true);
-      else if(difX < 0) this.player.sprite.setFrame(3);
+      else if(difX < 0) this.player.sprite.anims.play('left', true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
     if (this.player.targetY !== this.player.sprite.y) {
