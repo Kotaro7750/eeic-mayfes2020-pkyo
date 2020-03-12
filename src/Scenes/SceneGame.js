@@ -4,10 +4,7 @@ import Phaser from 'phaser';
 import StageRunner from '../stage/test/StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import playerImg from '../../public/stage/obake.png';
-import playerImg1 from '../../public/stage/obake2.png';
-import playerImg2 from '../../public/stage/obake3.png';
-import playerImg3 from '../../public/stage/obake4.png';
+import playerImg from '../../public/stage/ex1.png';
 import SimpleButton from '../Objects/Objects.js';
 
 class SceneGame extends Phaser.Scene {
@@ -66,7 +63,8 @@ class SceneGame extends Phaser.Scene {
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 32});
+    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight:48});
+    
   }
 
   create() {
@@ -132,6 +130,7 @@ class SceneGame extends Phaser.Scene {
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
+    
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
@@ -141,9 +140,17 @@ class SceneGame extends Phaser.Scene {
     const goalY = this.stageRunner.stageConfig.goalY;
     this.player.sprite = this.add.sprite(
         this.mapDat.tileWidth * playerX * this.map2Img,
-        this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img,
+        (this.mapDat.tileWidth + 1) * playerY * this.map2Img,
         'player');
     this.player.sprite.setOrigin(0, 1);
+    //ここでアニメーションの定義(187行目のようにthis.player.sprite.anims.play('right', true);でこのアニメーションを実行できる)
+    //これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
+    this.player.sprite.scene.anims.create({
+      key: 'right',
+      frames:this.player.sprite.scene.anims.generateFrameNumbers('player', { frames:[ 5, 6, 7, 8] }),
+      frameRate: 10,
+      repeat: -1
+    });
 
 
     this.player.gridX = playerX;
@@ -177,7 +184,7 @@ class SceneGame extends Phaser.Scene {
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      if(difX > 0) this.player.sprite.setFrame(6);
+      if(difX > 0) this.player.sprite.anims.play('right', true);
       else if(difX < 0) this.player.sprite.setFrame(3);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
@@ -282,6 +289,7 @@ class SceneGame extends Phaser.Scene {
   reset() {
     console.log('reset');
     if (!this.isCleared) {
+      this.player.sprite.setFrame(0);
       const playerX = this.stageRunner.stageConfig.playerX;
       const playerY = this.stageRunner.stageConfig.playerY;
       this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
