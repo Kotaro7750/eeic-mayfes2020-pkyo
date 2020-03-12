@@ -10,7 +10,7 @@ class SceneTitle extends Phaser.Scene {
 
   create() {
     this.game.scale.setGameSize(800, 600);
-    this.add.text(200, 50, 'Really Really\nCool Title', {fontSize: 50, color: 'white'});
+    this.add.text(200, 50, 'Apple', {fontSize: 50, color: 'red'});
 
     // SimpleButtonは自作class ../Objects/Objects.js に記述している
     const button0 = new SimpleButton(this, 300, 200, 200, 50, 0xff7f7f, 'start', 'red');
