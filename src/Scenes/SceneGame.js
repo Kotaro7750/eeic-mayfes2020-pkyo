@@ -5,7 +5,9 @@ import StageRunner from '../stage/test/StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
 import playerImg from '../../public/stage/obake.png';
-import goalImg from '../../public/stage/test/goaltest.png';
+import playerImg1 from '../../public/stage/obake2.png';
+import playerImg2 from '../../public/stage/obake3.png';
+import playerImg3 from '../../public/stage/obake4.png';
 import SimpleButton from '../Objects/Objects.js';
 
 class SceneGame extends Phaser.Scene {
@@ -65,7 +67,6 @@ class SceneGame extends Phaser.Scene {
     // player
     // TODO playerImgだけは動的importしてない
     this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 32});
-    this.load.image('goal', goalImg);
   }
 
   create() {
@@ -144,6 +145,7 @@ class SceneGame extends Phaser.Scene {
         'player');
     this.player.sprite.setOrigin(0, 1);
 
+
     this.player.gridX = playerX;
     this.player.gridY = playerY;
     this.player.targetX = this.player.sprite.x;
@@ -175,10 +177,14 @@ class SceneGame extends Phaser.Scene {
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
+      if(difX > 0) this.player.sprite.setFrame(6);
+      else if(difX < 0) this.player.sprite.setFrame(3);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
     if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
+      if(difY > 0) this.player.sprite.setFrame(9);
+      else if(difY < 0) this.player.sprite.setFrame(0);
       this.player.sprite.y += difY / Math.abs(difY) * 1;
     }
     if (++this.tick === this.cmdDelta) {
