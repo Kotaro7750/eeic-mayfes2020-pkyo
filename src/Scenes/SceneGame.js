@@ -16,10 +16,10 @@ const enumExecModeClear = 5;
 
 class SceneGame extends Phaser.Scene {
   init(data) {
-    this.loadedDataSrc.tilemap =
-      import('../../public/stage/' + data.stage_dir + '/tilemap.json');
-    this.loadedDataSrc.tilesets =
-      import('../../public/stage/' + data.stage_dir + '/tilesets.png');
+    this.loadedDataSrc.tilemap = import('../../public/stage/' + data.stage_dir + '/tilemap.json');
+    this.loadedDataSrc.tilesets = import('../../public/stage/' + data.stage_dir + '/tilesets.png');
+    this.blockDefs = import('../../public/stage/' + data.stage_dir + '/Blocks.json');
+    this.blockFuncs = import('../../public/stage/' + data.stage_dir + '/Blocks.js');
   }
 
   constructor() {
@@ -46,6 +46,8 @@ class SceneGame extends Phaser.Scene {
     this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
 
     this.loadedDataSrc = {};
+    this.blockDefs = {};
+    this.blockFuncs = {};
   }
 
   preload() {
@@ -67,35 +69,16 @@ class SceneGame extends Phaser.Scene {
   create() {
     this.game.scale.setGameSize(400, 600);
     // htmlボタンを可視化する
-    document.getElementById('executeButton').style.visibility='visible';
-    document.getElementById('pauseButton').style.visibility='visible';
+    document.getElementById('executeButton').style.visibility = 'visible';
+    document.getElementById('pauseButton').style.visibility = 'visible';
 
-    // stage固有ブロックの定義 stageの定義の方に移せると思う
-    // stage option
-    this.blocklyRunner.setBlockDefinition('move', {
-      'type': 'move',
-      'message0': '%1 にすすむ',
-      'args0': [{
-        'type': 'field_dropdown',
-        'name': 'move_direction',
-        'options': [
-          ['→', '0'],
-          ['←', '1'],
-          ['↑', '2'],
-          ['↓', '3'],
-        ],
-      }],
-      'previousStatement': null,
-      'nextStatement': null,
-      'colour': 270,
-      'tooltip': '',
-      'helpUrl': '',
-    }, function(block) {
-      // TODO: ここ、blockをJSON.stringifyしてyieldの返り値で返せばhighlight出来る
-      const dropdownDirection = block.getFieldValue('move_direction');
-      return `this.tryMove(this.player, ${dropdownDirection});\
-                this.cmdDelta=35;\
-                yield true;\n`;
+    // stage固有ブロックの定義
+    Promise.all([this.blockDefs, this.blockFuncs]).then((arr) => {
+      const blocks = arr[0].blocks;
+      const defs = arr[1];
+      for (const i in blocks) {
+        this.blocklyRunner.setBlockDefinition(blocks[i].name, blocks[i].block, defs.default['block_' + blocks[i].name]);
+      }
     });
 
     // blocklyのdiv.style.leftを予め調整しておく
@@ -108,6 +91,7 @@ class SceneGame extends Phaser.Scene {
         .then((space) => {
           this.workspace = space;
         });
+
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
     this.mapDat = this.add.tilemap('map1');
@@ -275,11 +259,11 @@ class SceneGame extends Phaser.Scene {
   // シーンを終了する時は必ずこの関数を通ること
   exitScene() {
     this.workspace.dispose();
-    this.workspace=null;
-    document.getElementById('executeButton').style.visibility='hidden';
-    document.getElementById('pauseButton').style.visibility='hidden';
-    document.getElementById('executeButton').onclick=null;
-    document.getElementById('pauseButton').onclick=null;
+    this.workspace = null;
+    document.getElementById('executeButton').style.visibility = 'hidden';
+    document.getElementById('pauseButton').style.visibility = 'hidden';
+    document.getElementById('executeButton').onclick = null;
+    document.getElementById('pauseButton').onclick = null;
   };
 
   // TODO: ここに置くべきかどうか考えておく
