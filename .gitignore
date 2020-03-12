@@ -1,6 +1,6 @@
 .python-version
 node_modules/
 public/bundle.js
+package-lock.json
 .vscode
-.eslintrc.json
 .DS_Store

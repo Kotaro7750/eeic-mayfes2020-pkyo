@@ -1,0 +1,20 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+        "google"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parser": "babel-eslint",
+    "rules": {
+        "semi": [2, "always"],
+        "max-len": "warn",
+        "require-jsdoc": "off", // TODO: 本当はONにしたいお気持ち(全部に書くのは1人じゃ無理)
+        "valid-jsdoc": "off"
+    }
+}

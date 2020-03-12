@@ -19,9 +19,9 @@ class BlocklyRunner {
   }
 
   setBlockDefinition(name, init, conv) {
-    Blockly.Blocks[name] = {
-      init: init,
-    };
+    Blockly.defineBlocksWithJsonArray([
+      init,
+    ]);
     Blockly.JavaScript[name] = (name) => {
       return conv(name);
     };
@@ -30,13 +30,16 @@ class BlocklyRunner {
   // ステージによらず常に読み込むブロックの定義を列挙する
   // constructorの可読性に配慮し分離
   setCommonBlockDefinition() {
-    this.setBlockDefinition('loop', function() {
-      this.appendDummyInput()
-          .appendField('ずっと繰り返す');
-      this.appendStatementInput('LOOP');
-      this.setColour(360);
-      this.setTooltip('');
-      this.setHelpUrl('');
+    this.setBlockDefinition('loop', {
+      'type': 'loop', // this should be same value as name
+      'message0': '%1 をずっと繰り返す',
+      'args0': [{
+        'type': 'input_statement',
+        'name': 'LOOP',
+      }],
+      'style': 'loop_blocks',
+      'tooltip': '',
+      'helpUrl': '',
     }, function(block) {
       const code = Blockly.JavaScript.statementToCode(block, 'LOOP');
       return 'while (true) {\n' +

@@ -1,4 +1,3 @@
-/* unko*/
 import Phaser from 'phaser';
 import SimpleButton from '../Objects/Objects.js';
 
@@ -15,7 +14,9 @@ class SceneTitle extends Phaser.Scene {
 
     // SimpleButtonは自作class ../Objects/Objects.js に記述している
     const button0 = new SimpleButton(this, 300, 200, 200, 50, 0xff7f7f, 'start', 'red');
+    // eslint-disable-next-line no-unused-vars
     const button1 = new SimpleButton(this, 300, 280, 200, 50, 0x7fff7f, 'dummy', 'green');
+    // eslint-disable-next-line no-unused-vars
     const button2 = new SimpleButton(this, 300, 360, 200, 50, 0x7f7fff, 'dummy', 'blue');
 
     // コールバックの指定
