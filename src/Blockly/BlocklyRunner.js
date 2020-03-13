@@ -3,6 +3,8 @@ import Blockly from 'blockly';
 class BlocklyRunner {
   constructor(xmlFilePath) {
     // ステージによらず常に読み込むブロックの定義を列挙する
+    this.commonBlockDefs;
+    this.commonBlockFuncs;
     this.setCommonBlockDefinition();
 
     this.xmlFilePath = xmlFilePath;
@@ -30,23 +32,17 @@ class BlocklyRunner {
   // ステージによらず常に読み込むブロックの定義を列挙する
   // constructorの可読性に配慮し分離
   setCommonBlockDefinition() {
-    this.setBlockDefinition('loop', {
-      'type': 'loop', // this should be same value as name
-      'message0': '%1 をずっと繰り返す',
-      'args0': [{
-        'type': 'input_statement',
-        'name': 'LOOP',
-      }],
-      'style': 'loop_blocks',
-      'tooltip': '',
-      'helpUrl': '',
-    }, function(block) {
-      const code = Blockly.JavaScript.statementToCode(block, 'LOOP');
-      return 'while (true) {\n' +
-                'this.cmdDelta=1;' +
-                'yield true;\n' +
-                code +
-                '}\n';
+    // 定義ファイルの読み込み
+    this.commonBlockDefs = import('./Blocks.json');
+    this.commonBlockFuncs = import('./Blocks.js');
+
+    // 汎用ブロックの定義
+    Promise.all([this.commonBlockDefs, this.commonBlockFuncs]).then((arr) => {
+      const blocks = arr[0].blocks;
+      const defs = arr[1];
+      blocks.forEach( (elem) =>{
+        this.setBlockDefinition(elem.name, elem.block, defs.default['common_block_' + elem.name]);
+      });
     });
   }
 
