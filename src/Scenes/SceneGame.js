@@ -76,9 +76,9 @@ class SceneGame extends Phaser.Scene {
     Promise.all([this.blockDefs, this.blockFuncs]).then((arr) => {
       const blocks = arr[0].blocks;
       const defs = arr[1];
-      for (const i in blocks) {
-        this.blocklyRunner.setBlockDefinition(blocks[i].name, blocks[i].block, defs.default['block_' + blocks[i].name]);
-      }
+      blocks.forEach( (elem) =>{
+        this.blocklyRunner.setBlockDefinition(elem.name, elem.block, defs.default['block_' + elem.name]);
+      });
     });
 
     // blocklyのdiv.style.leftを予め調整しておく

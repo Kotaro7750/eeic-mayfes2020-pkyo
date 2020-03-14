@@ -1,0 +1,16 @@
+{"blocks":[
+  {
+    "name":"loop",
+    "block": {
+      "type": "loop",
+      "message0": "%1 をずっと繰り返す",
+      "args0": [{
+        "type": "input_statement",
+        "name": "LOOP"
+      }],
+      "style": "loop_blocks",
+      "tooltip": "",
+      "helpUrl": ""
+    }
+  }
+]}
