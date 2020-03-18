@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import StageRunner from '../stage/test/StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import playerImg from '../stage/obake.png';
+import playerImg from '../../public/stage/ex1.png';
 import SimpleButton from '../Objects/Objects.js';
 
 const enumExecModePre = 1;
@@ -63,7 +63,7 @@ class SceneGame extends Phaser.Scene {
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
   }
 
   create() {
@@ -107,6 +107,21 @@ class SceneGame extends Phaser.Scene {
     this.player.sprite.setOrigin(0, 1);
     // プレイヤーの位置等の初期化処理をしている
     this.initGameField();
+    // ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)
+    // これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
+    this.player.sprite.scene.anims.create({
+      key: 'right',
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [5, 6, 7, 8]}),
+      frameRate: 7,
+      repeat: -1,
+    });
+    this.player.sprite.scene.anims.create({
+      key: 'left',
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [0, 1, 2, 3]}),
+      frameRate: 7,
+      repeat: -1,
+    });
+    this.player.sprite.setFrame(4);
 
     // リセットボタン
     const buttonReset = new SimpleButton(this, 300, 0, 100, 30, 0x7f7fff, 'reset', 'blue');
@@ -133,8 +148,8 @@ class SceneGame extends Phaser.Scene {
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      if (difX > 0) this.player.sprite.setFrame(6);
-      else if (difX < 0) this.player.sprite.setFrame(3);
+      if (difX > 0) this.player.sprite.anims.play('right', true);
+      else if (difX < 0) this.player.sprite.anims.play('left', true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
     if (this.player.targetY !== this.player.sprite.y) {
@@ -212,6 +227,7 @@ class SceneGame extends Phaser.Scene {
     console.log('pause blockly');
     if (this.execMode === enumExecModeRun) {
       this.execMode = enumExecModePause;
+      this.player.sprite.anims.stop(); // anims.stopでアニメーション停止
     } else if (this.execMode === enumExecModePause) {
       this.execMode = enumExecModeRun;
     }
@@ -231,6 +247,8 @@ class SceneGame extends Phaser.Scene {
   // TODO: ここ冗長そう（constructorと同様の処理を書くのはアです）←まとめました
   initGameField() {
     console.log('initGameField');
+    this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
+    this.player.sprite.setFrame(4);// 正面を向くようにしている
 
     const playerX = this.stageRunner.stageConfig.playerX;
     const playerY = this.stageRunner.stageConfig.playerY;
