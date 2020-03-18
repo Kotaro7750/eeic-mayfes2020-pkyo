@@ -63,8 +63,7 @@ class SceneGame extends Phaser.Scene {
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight:48});
-    
+    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
   }
 
   create() {
@@ -130,7 +129,6 @@ class SceneGame extends Phaser.Scene {
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
-    
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
@@ -143,20 +141,21 @@ class SceneGame extends Phaser.Scene {
         (this.mapDat.tileWidth + 1) * playerY * this.map2Img,
         'player');
     this.player.sprite.setOrigin(0, 1);
-    //ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)
-    //これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
+    // ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)
+    // これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
     this.player.sprite.scene.anims.create({
       key: 'right',
-      frames:this.player.sprite.scene.anims.generateFrameNumbers('player', { frames:[ 5, 6, 7, 8] }),
-      frameRate: 10,
-      repeat: -1
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [5, 6, 7, 8]}),
+      frameRate: 7,
+      repeat: -1,
     });
     this.player.sprite.scene.anims.create({
       key: 'left',
-      frames:this.player.sprite.scene.anims.generateFrameNumbers('player', { frames:[ 0, 1, 2, 3] }),
-      frameRate: 10,
-      repeat: -1
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [0, 1, 2, 3]}),
+      frameRate: 7,
+      repeat: -1,
     });
+    this.player.sprite.setFrame(4);
 
 
     this.player.gridX = playerX;
@@ -190,14 +189,14 @@ class SceneGame extends Phaser.Scene {
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      if(difX > 0) this.player.sprite.anims.play('right', true);
-      else if(difX < 0) this.player.sprite.anims.play('left', true);
+      if (difX > 0) this.player.sprite.anims.play('right', true);
+      else if (difX < 0) this.player.sprite.anims.play('left', true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
     if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
-      if(difY > 0) this.player.sprite.setFrame(9);
-      else if(difY < 0) this.player.sprite.setFrame(0);
+      if (difY > 0) this.player.sprite.setFrame(9);
+      else if (difY < 0) this.player.sprite.setFrame(0);
       this.player.sprite.y += difY / Math.abs(difY) * 1;
     }
     if (++this.tick === this.cmdDelta) {
@@ -278,6 +277,7 @@ class SceneGame extends Phaser.Scene {
     if (!this.isRunning) return;
     console.log('pause blockly');
     this.isPause = !this.isPause;
+    this.player.sprite.anims.stop(); // anims.stopでアニメーション停止
     this.redrawPauseButton();
   };
 
@@ -295,7 +295,8 @@ class SceneGame extends Phaser.Scene {
   reset() {
     console.log('reset');
     if (!this.isCleared) {
-      this.player.sprite.setFrame(0);
+      this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
+      this.player.sprite.setFrame(4);// 正面を向くようにしている
       const playerX = this.stageRunner.stageConfig.playerX;
       const playerY = this.stageRunner.stageConfig.playerY;
       this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
