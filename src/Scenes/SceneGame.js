@@ -4,8 +4,9 @@ import Phaser from 'phaser';
 import StageRunner from '../stage/test/StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import playerImg from '../../public/stage/ex1.png';
+import playerImg from './stage/ex1.png';
 import SimpleButton from '../Objects/Objects.js';
+import { toUnicode } from 'punycode';
 
 const enumExecModePre = 1;
 const enumExecModeRun = 2;
@@ -26,6 +27,7 @@ class SceneGame extends Phaser.Scene {
     super({ key: 'game' });
 
     this.workspace;
+    this.field;
 
     // game管理classのうちphaser持ち
     this.player = new Player();
@@ -88,9 +90,9 @@ class SceneGame extends Phaser.Scene {
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
     this.blocklyRunner.renderBlockly(this.startBlockly.bind(this), this.pauseBlockly.bind(this))
-      .then((space) => {
-        this.workspace = space;
-      });
+    .then((space) => {
+      this.workspace = space;
+    });
 
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
@@ -130,9 +132,18 @@ class SceneGame extends Phaser.Scene {
         this.initGameField();
       }
     }.bind(this));
+    const buttonUndo = new SimpleButton(this, 100, 0, 100, 30, 0x7fff7f, 'undo', 'green');
+    buttonUndo.button.on('pointerdown', function() {
+      this.workspace.undo(false);
+    }.bind(this));
+    const buttonRedo = new SimpleButton(this, 200, 0, 100, 30, 0x7fff7f, 'redo', 'green');
+    buttonRedo.button.on('pointerdown', function() {
+      this.workspace.undo(true);
+    }.bind(this));
     // ステージセレクトに戻る
     const buttonBack = new SimpleButton(this, 0, 0, 100, 30, 0x7fff7f, 'back', 'green');
     buttonBack.button.on('pointerdown', function() {
+      this.dispose();
       this.exitScene();
       this.scene.start('stage-select');
     }.bind(this));
