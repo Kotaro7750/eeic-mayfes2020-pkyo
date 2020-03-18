@@ -1,7 +1,7 @@
 import Blockly from 'blockly';
 import Phaser from 'phaser';
 
-import StageRunner from '../stage/test/StageRunner';
+import StageRunner from '../StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
 import playerImg from '../../public/stage/ex1.png';
@@ -16,10 +16,7 @@ const enumExecModeClear = 5;
 
 class SceneGame extends Phaser.Scene {
   init(data) {
-    this.loadedDataSrc.tilemap = import('../stage/' + data.stage_dir + '/tilemap.json');
-    this.loadedDataSrc.tilesets = import('../stage/' + data.stage_dir + '/tilesets.png');
-    this.blockDefs = import('../stage/' + data.stage_dir + '/Blocks.json');
-    this.blockFuncs = import('../stage/' + data.stage_dir + '/Blocks.js');
+    this.stageDir = data.stage_dir;
   }
 
   constructor() {
@@ -40,45 +37,45 @@ class SceneGame extends Phaser.Scene {
 
     this.execMode;
 
-    // stagerunner class
-    this.stageRunner = new StageRunner();
-    // blocklyrunner class
-    this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
+    this.stageDir;
 
-    this.loadedDataSrc = {};
-    this.blockDefs = {};
-    this.blockFuncs = {};
+    // stagerunner class
+    this.stageRunner;
+    // blocklyrunner class
+    this.blocklyRunner;
   }
 
-  preload() {
-    // この内容はStageRunner.loadに入れたいけど、出来ていない
-    // map
-    this.loadedDataSrc.tilemap.then((res) => {
-      this.load.tilemapTiledJSON('map1', res.default);
-    });
-
-    this.loadedDataSrc.tilesets.then((res) => {
-      this.load.image('tiles', res.default);
-    });
+  async preload() {
+    this.stageRunner = new StageRunner(this.stageDir);
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
+    this.load.spritesheet('player', playerImg, { frameWidth: 32, frameHeight: 48 });
+
+    let awaitedResources = await this.stageRunner.preload();
+    this.load.tilemapTiledJSON('map1', awaitedResources[0]);
+    this.load.image('tiles', awaitedResources[1]);
   }
 
-  create() {
+  async create() {
+    let awaitedResources = await this.stageRunner.load();
+
+    this.stageRunner.xmlFilePath = awaitedResources[0];
+    this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
+
+    this.stageRunner.stageConfig = awaitedResources[1];
+
+    this.stageRunner.blockDefs = awaitedResources[2];
+    this.stageRunner.blockFuncs = awaitedResources[3];
+
     this.game.scale.setGameSize(400, 600);
     // htmlボタンを可視化する
     document.getElementById('executeButton').style.visibility = 'visible';
     document.getElementById('pauseButton').style.visibility = 'visible';
 
     // stage固有ブロックの定義
-    Promise.all([this.blockDefs, this.blockFuncs]).then((arr) => {
-      const blocks = arr[0].blocks;
-      const defs = arr[1];
-      blocks.forEach( (elem) =>{
-        this.blocklyRunner.setBlockDefinition(elem.name, elem.block, defs.default['block_' + elem.name]);
-      });
+    this.stageRunner.blockDefs.forEach((elem) => {
+      this.blocklyRunner.setBlockDefinition(elem.name, elem.block, this.stageRunner.blockFuncs.default['block_' + elem.name]);
     });
 
     // blocklyのdiv.style.leftを予め調整しておく
