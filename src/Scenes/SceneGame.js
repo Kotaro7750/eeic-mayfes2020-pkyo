@@ -206,6 +206,8 @@ class SceneGame extends Phaser.Scene {
         this.execMode = enumExecModeClear;
       } else {
         const gen = this.commandGenerator.next();
+        console.log(gen.value);
+        this.workspace.highlightBlock(gen.value)
         if (gen.done) {
           this.execMode = enumExecModeDone;
           this.blocklyRunner.endRunning();
