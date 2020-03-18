@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import StageRunner from '../stage/test/StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import playerImg from './stage/ex1.png';
+import playerImg from '../stage/ex1.png';
 import SimpleButton from '../Objects/Objects.js';
 import { toUnicode } from 'punycode';
 
