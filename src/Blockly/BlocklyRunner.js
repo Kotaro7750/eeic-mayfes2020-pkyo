@@ -1,12 +1,13 @@
 import Blockly from 'blockly';
+import commonBlockDefs from './Blocks.json';
+import commonBlockFuncs from './Blocks.js';
 
 class BlocklyRunner {
   constructor(xmlFilePath) {
     // ステージによらず常に読み込むブロックの定義を列挙する
     this.commonBlockDefs;
     this.commonBlockFuncs;
-    //this.setCommonBlockDefinition();
-
+    this.setCommonBlockDefinition();
     this.xmlFilePath = xmlFilePath;
   }
 
@@ -29,20 +30,10 @@ class BlocklyRunner {
     };
   }
 
-  // ステージによらず常に読み込むブロックの定義を列挙する
-  // constructorの可読性に配慮し分離
-  async setCommonBlockDefinition() {
-    // 定義ファイルの読み込み
-    this.commonBlockDefs = import('./Blocks.json');
-    this.commonBlockFuncs = import('./Blocks.js');
-
-    // 汎用ブロックの定義
-    await Promise.all([this.commonBlockDefs, this.commonBlockFuncs]).then((arr) => {
-      const blocks = arr[0].blocks;
-      const defs = arr[1];
-      blocks.forEach( (elem) =>{
-        this.setBlockDefinition(elem.name, elem.block, defs.default['common_block_' + elem.name]);
-      });
+  // 共通ブロック(ステージによらず常に読み込むブロック)の定義を読み込む
+  setCommonBlockDefinition() {
+    commonBlockDefs.blocks.forEach( (elem) =>{
+      this.setBlockDefinition(elem.name, elem.block, commonBlockFuncs['common_block_' + elem.name]);
     });
   }
 

@@ -62,7 +62,7 @@ class SceneGame extends Phaser.Scene {
 
     this.stageRunner.xmlFilePath = awaitedResources[0];
     this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
-    await this.blocklyRunner.setCommonBlockDefinition();
+    //await this.blocklyRunner.setCommonBlockDefinition();
 
     this.stageRunner.stageConfig = awaitedResources[1];
 
