@@ -164,19 +164,18 @@ class SceneGame extends Phaser.Scene {
   // 実行中の処理を行うパート
   updateOnRunning() {
     console.log(this.player.dir);
-    if(this.tick===0)this.setDir();
     // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
     if (this.player.targetX !== this.player.sprite.x) {
-      console.log("moveright");
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      if(difX!=0)this.player.sprite.anims.play(this.player.dir,true);
+      this.player.sprite.anims.play(this.player.dir,true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
-    }
-    if (this.player.targetY !== this.player.sprite.y) {
+    }else if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
-      if(difY!=0)this.setDir();
+      this.setDir();
       this.player.sprite.y += difY / Math.abs(difY) * 1;
+    }else{
+      this.setDir();
     }
     if (++this.tick === this.cmdDelta) {
       this.tick = 0;
