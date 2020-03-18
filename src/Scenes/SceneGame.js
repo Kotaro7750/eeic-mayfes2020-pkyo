@@ -121,7 +121,7 @@ class SceneGame extends Phaser.Scene {
       frameRate: 7,
       repeat: -1,
     });
-    this.player.sprite.setFrame(4);
+    this.setDir();
 
     // リセットボタン
     const buttonReset = new SimpleButton(this, 300, 0, 100, 30, 0x7f7fff, 'reset', 'blue');
@@ -142,24 +142,45 @@ class SceneGame extends Phaser.Scene {
     if (this.execMode === enumExecModeRun) this.updateOnRunning();
   }
 
+  setDir() {
+    switch (this.player.dir) {
+      case 'down':
+        this.player.sprite.setFrame(4);
+        break;
+      case 'up':
+        this.player.sprite.setFrame(9);
+        break;
+      case 'right':
+        this.player.sprite.setFrame(5);
+        break;
+      case 'left':
+        this.player.sprite.setFrame(0);
+        break;
+      default:
+        console.error('incorrect dir in setDir()');
+    }
+  };
+
   // 実行中の処理を行うパート
   updateOnRunning() {
+    console.log(this.player.dir);
+    if(this.tick===0)this.setDir();
     // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
     if (this.player.targetX !== this.player.sprite.x) {
+      console.log("moveright");
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      if (difX > 0) this.player.sprite.anims.play('right', true);
-      else if (difX < 0) this.player.sprite.anims.play('left', true);
+      if(difX!=0)this.player.sprite.anims.play(this.player.dir,true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
     if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
-      if (difY > 0) this.player.sprite.setFrame(9);
-      else if (difY < 0) this.player.sprite.setFrame(0);
+      if(difY!=0)this.setDir();
       this.player.sprite.y += difY / Math.abs(difY) * 1;
     }
     if (++this.tick === this.cmdDelta) {
       this.tick = 0;
+      //向きをplayerDに揃える
       // runCodeとゴール判定を同じタイミングで行うことで、移動が完了してから(正確には次のコードを受理できるタイミングになってから)ゴール判定がなされるようにした
       // ゴール判定を満たすならばゴール処理
       // そうでなければ通常の処理
@@ -248,10 +269,11 @@ class SceneGame extends Phaser.Scene {
   initGameField() {
     console.log('initGameField');
     this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
-    this.player.sprite.setFrame(4);// 正面を向くようにしている
+    
 
     const playerX = this.stageRunner.stageConfig.playerX;
     const playerY = this.stageRunner.stageConfig.playerY;
+    const playerD = this.stageRunner.stageConfig.playerD;
     const goalX = this.stageRunner.stageConfig.goalX;
     const goalY = this.stageRunner.stageConfig.goalY;
 
@@ -260,6 +282,8 @@ class SceneGame extends Phaser.Scene {
 
     this.player.gridX = playerX;
     this.player.gridY = playerY;
+    this.player.dir = playerD;
+    this.setDir();// 指定した向きを向くようにしている
     this.player.targetX = this.player.sprite.x;
     this.player.targetY = this.player.sprite.y;
     this.goal.gridX = goalX;
@@ -284,8 +308,13 @@ class SceneGame extends Phaser.Scene {
     document.getElementById('pauseButton').onclick = null;
   };
 
+  
   // TODO: ここに置くべきかどうか考えておく
+  changeDir(player, dir) { //向きを変えるとかのブロックに使う
+    player.dir=dir;
+  }
   tryMove(player, dir) {
+    this.changeDir(player,["right","left","up","down"][dir]);
     if (dir < 0 || dir >= 4) console.error('incorrect dir in tryMove()');
 
     const dx = [1, -1, 0, 0];

@@ -28,5 +28,6 @@
     "playerX": 5,
     "playerY": 12,
     "goalX": 10,
-    "goalY": 12
+    "goalY": 12,
+    "playerD" : "left"
 }
