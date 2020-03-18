@@ -7,16 +7,24 @@ import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 import playerImg from '../../public/stage/ex1.png';
 import SimpleButton from '../Objects/Objects.js';
 
+const enumExecModePre = 1;
+const enumExecModeRun = 2;
+const enumExecModePause = 3;
+const enumExecModeDone = 4;
+const enumExecModeClear = 5;
+
+
 class SceneGame extends Phaser.Scene {
   init(data) {
-    this.loadedDataSrc.tilemap = import('../../public/stage/' + data.stage_dir + '/tilemap.json');
-    this.loadedDataSrc.tilesets = import('../../public/stage/' + data.stage_dir + '/tilesets.png');
+    this.loadedDataSrc.tilemap = import('../stage/' + data.stage_dir + '/tilemap.json');
+    this.loadedDataSrc.tilesets = import('../stage/' + data.stage_dir + '/tilesets.png');
+    this.blockDefs = import('../stage/' + data.stage_dir + '/Blocks.json');
+    this.blockFuncs = import('../stage/' + data.stage_dir + '/Blocks.js');
   }
 
   constructor() {
-    super({key: 'game'});
+    super({ key: 'game' });
 
-    // 僕のblocklyに対するブチ切れ案件1
     this.workspace;
 
     // game管理classのうちphaser持ち
@@ -30,17 +38,7 @@ class SceneGame extends Phaser.Scene {
     this.cmdDelta;
     this.tick;
 
-    // これらはgame管理classへ飛ばせる
-
-    // コードの実行中であるか
-    this.isRunning;
-    // ステージがクリア状態であるか
-    this.isCleared;
-    // コードの開始を行って良いか
-    this.isExecutable = true;
-
-    // ポーズ状態であるか
-    this.isPause;
+    this.execMode;
 
     // stagerunner class
     this.stageRunner = new StageRunner();
@@ -48,6 +46,8 @@ class SceneGame extends Phaser.Scene {
     this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
 
     this.loadedDataSrc = {};
+    this.blockDefs = {};
+    this.blockFuncs = {};
   }
 
   preload() {
@@ -68,47 +68,17 @@ class SceneGame extends Phaser.Scene {
 
   create() {
     this.game.scale.setGameSize(400, 600);
-
-    // 変数の初期化(再start時に勝手に初期化してくれない？ので)
-    this.commandGenerator=null;
-    // cmdDeltaは命令実行毎に書き換わるようにした
-    this.cmdDelta = 1;
-    this.tick = 0;
-    this.isRunning = false;
-    this.isPause = false;
-    this.isCleared = false;
-    this.isExecutable = true;
-
     // htmlボタンを可視化する
-    document.getElementById('executeButton').style.visibility='visible';
-    document.getElementById('pauseButton').style.visibility='visible';
+    document.getElementById('executeButton').style.visibility = 'visible';
+    document.getElementById('pauseButton').style.visibility = 'visible';
 
-    // stage固有ブロックの定義 stageの定義の方に移せると思う
-    // stage option
-    this.blocklyRunner.setBlockDefinition('move', {
-      'type': 'move',
-      'message0': '%1 にすすむ',
-      'args0': [{
-        'type': 'field_dropdown',
-        'name': 'move_direction',
-        'options': [
-          ['→', '0'],
-          ['←', '1'],
-          ['↑', '2'],
-          ['↓', '3'],
-        ],
-      }],
-      'previousStatement': null,
-      'nextStatement': null,
-      'colour': 270,
-      'tooltip': '',
-      'helpUrl': '',
-    }, function(block) {
-      // TODO: ここ、blockをJSON.stringifyしてyieldの返り値で返せばhighlight出来る
-      const dropdownDirection = block.getFieldValue('move_direction');
-      return `this.tryMove(this.player, ${dropdownDirection});\
-                this.cmdDelta=35;\
-                yield true;\n`;
+    // stage固有ブロックの定義
+    Promise.all([this.blockDefs, this.blockFuncs]).then((arr) => {
+      const blocks = arr[0].blocks;
+      const defs = arr[1];
+      blocks.forEach( (elem) =>{
+        this.blocklyRunner.setBlockDefinition(elem.name, elem.block, defs.default['block_' + elem.name]);
+      });
     });
 
     // blocklyのdiv.style.leftを予め調整しておく
@@ -118,9 +88,10 @@ class SceneGame extends Phaser.Scene {
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
     this.blocklyRunner.renderBlockly(this.startBlockly.bind(this), this.pauseBlockly.bind(this))
-        .then((space) => {
-          this.workspace = space;
-        });
+      .then((space) => {
+        this.workspace = space;
+      });
+
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
     this.mapDat = this.add.tilemap('map1');
@@ -128,19 +99,14 @@ class SceneGame extends Phaser.Scene {
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
     this.backgroundLayer.setScale(this.map2Img);
-    this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
+    this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
-    const playerX = this.stageRunner.stageConfig.playerX;
-    const playerY = this.stageRunner.stageConfig.playerY;
-    const goalX = this.stageRunner.stageConfig.goalX;
-    const goalY = this.stageRunner.stageConfig.goalY;
-    this.player.sprite = this.add.sprite(
-        this.mapDat.tileWidth * playerX * this.map2Img,
-        (this.mapDat.tileWidth + 1) * playerY * this.map2Img,
-        'player');
+    this.player.sprite = this.add.sprite(0, 0, 'player');
     this.player.sprite.setOrigin(0, 1);
+    // プレイヤーの位置等の初期化処理をしている
+    this.initGameField();
     // ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)
     // これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
     this.player.sprite.scene.anims.create({
@@ -157,18 +123,12 @@ class SceneGame extends Phaser.Scene {
     });
     this.player.sprite.setFrame(4);
 
-
-    this.player.gridX = playerX;
-    this.player.gridY = playerY;
-    this.player.targetX = this.player.sprite.x;
-    this.player.targetY = this.player.sprite.y;
-    this.goal.gridX = goalX;
-    this.goal.gridY = goalY;
-
     // リセットボタン
     const buttonReset = new SimpleButton(this, 300, 0, 100, 30, 0x7f7fff, 'reset', 'blue');
     buttonReset.button.on('pointerdown', function() {
-      this.reset();
+      if (this.execMode !== enumExecModeClear) {
+        this.initGameField();
+      }
     }.bind(this));
     // ステージセレクトに戻る
     const buttonBack = new SimpleButton(this, 0, 0, 100, 30, 0x7fff7f, 'back', 'green');
@@ -179,8 +139,7 @@ class SceneGame extends Phaser.Scene {
   }
 
   update() {
-    if (this.isPause) return;
-    if (this.isRunning) this.updateOnRunning();
+    if (this.execMode === enumExecModeRun) this.updateOnRunning();
   }
 
   // 実行中の処理を行うパート
@@ -208,8 +167,6 @@ class SceneGame extends Phaser.Scene {
         const button = new SimpleButton(this, 50, 500, 100, 50, 0x7fff7f, '次へ', 'green');
         const buttonT = new SimpleButton(this, 50, 550, 250, 50, 0xff7f7f, 'タイトルへ', 'red');
         const buttonS = new SimpleButton(this, 50, 450, 250, 50, 0x7f7fff, 'ステージ', 'blue');
-        // ボタンを消す処理等が整備されていないため、clear後のリセットができない
-        // var buttonR = new SimpleButton(this,50,400,250,50,0xff7fff,'やりなおす','purple');
         // eslint-disable-next-line no-unused-vars
         const button2 = new SimpleButton(this, 50, 200, 300, 50, 0xfffff00, 'Game Clear', 'green');
         button.button.on('pointerdown', function() {
@@ -225,18 +182,12 @@ class SceneGame extends Phaser.Scene {
           this.exitScene();
           this.scene.start('title');
         }.bind(this));
-        /*
-        buttonR.button.on('pointerdown', function(){
-          this.isCleared=false;
-          this.reset();
-        }.bind(this));
-*/
-        this.isCleared=true;
-        this.isRunning=false;
+
+        this.execMode = enumExecModeClear;
       } else {
         const gen = this.commandGenerator.next();
         if (gen.done) {
-          this.isRunning = false;
+          this.execMode = enumExecModeDone;
           this.blocklyRunner.endRunning();
         }
       }
@@ -248,9 +199,8 @@ class SceneGame extends Phaser.Scene {
 
   startBlockly() {
     console.log('start blockly');
-    if (this.isExecutable) {
-      this.isExecutable = false;
-      this.isRunning=true;
+    if (this.execMode === enumExecModePre) {
+      this.execMode = enumExecModeRun;
 
       console.log(this.workspace);
       let code = Blockly.JavaScript.workspaceToCode(this.workspace);
@@ -274,16 +224,19 @@ class SceneGame extends Phaser.Scene {
 
   pauseBlockly() {
     // ポーズした時の処理を入れる
-    if (!this.isRunning) return;
     console.log('pause blockly');
-    this.isPause = !this.isPause;
-    this.player.sprite.anims.stop(); // anims.stopでアニメーション停止
+    if (this.execMode === enumExecModeRun) {
+      this.execMode = enumExecModePause;
+      this.player.sprite.anims.stop(); // anims.stopでアニメーション停止
+    } else if (this.execMode === enumExecModePause) {
+      this.execMode = enumExecModeRun;
+    }
     this.redrawPauseButton();
   };
 
   redrawPauseButton() {
     const element = document.getElementById('pauseButton');
-    if (this.isPause) {
+    if (this.execMode === enumExecModePause) {
       element.innerHTML = 'restart';
     } else {
       element.innerHTML = 'pause';
@@ -291,40 +244,44 @@ class SceneGame extends Phaser.Scene {
   };
 
   // playerの位置を初期位置に戻す
-  // TODO: ここ冗長そう（constructorと同様の処理を書くのはアです）
-  reset() {
-    console.log('reset');
-    if (!this.isCleared) {
-      this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
-      this.player.sprite.setFrame(4);// 正面を向くようにしている
-      const playerX = this.stageRunner.stageConfig.playerX;
-      const playerY = this.stageRunner.stageConfig.playerY;
-      this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
-      this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
+  // TODO: ここ冗長そう（constructorと同様の処理を書くのはアです）←まとめました
+  initGameField() {
+    console.log('initGameField');
+    this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
+    this.player.sprite.setFrame(4);// 正面を向くようにしている
 
-      this.player.gridX = playerX;
-      this.player.gridY = playerY;
-      this.player.targetX = this.player.sprite.x;
-      this.player.targetY = this.player.sprite.y;
+    const playerX = this.stageRunner.stageConfig.playerX;
+    const playerY = this.stageRunner.stageConfig.playerY;
+    const goalX = this.stageRunner.stageConfig.goalX;
+    const goalY = this.stageRunner.stageConfig.goalY;
 
-      this.isRunning = false;
-      this.isPause = false;
-      this.isExecutable = true;
+    this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
+    this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
 
-      this.redrawPauseButton();
-      this.commandGenerator = null;
-    }
+    this.player.gridX = playerX;
+    this.player.gridY = playerY;
+    this.player.targetX = this.player.sprite.x;
+    this.player.targetY = this.player.sprite.y;
+    this.goal.gridX = goalX;
+    this.goal.gridY = goalY;
+
+    this.execMode = enumExecModePre;
+
+    this.redrawPauseButton();
+    this.commandGenerator = null;
+    this.cmdDelta = 1;
+    this.tick = 0;
   };
 
 
   // シーンを終了する時は必ずこの関数を通ること
   exitScene() {
     this.workspace.dispose();
-    this.workspace=null;
-    document.getElementById('executeButton').style.visibility='hidden';
-    document.getElementById('pauseButton').style.visibility='hidden';
-    document.getElementById('executeButton').onclick=null;
-    document.getElementById('pauseButton').onclick=null;
+    this.workspace = null;
+    document.getElementById('executeButton').style.visibility = 'hidden';
+    document.getElementById('pauseButton').style.visibility = 'hidden';
+    document.getElementById('executeButton').onclick = null;
+    document.getElementById('pauseButton').onclick = null;
   };
 
   // TODO: ここに置くべきかどうか考えておく

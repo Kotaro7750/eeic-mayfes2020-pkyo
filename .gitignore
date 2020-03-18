@@ -1,6 +1,9 @@
 .python-version
 node_modules/
 public/bundle.js
+public/*.bundle.js
+public/*.xml
+public/*.png
 package-lock.json
 .vscode
 .DS_Store
