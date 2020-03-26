@@ -20,7 +20,7 @@ class SceneGame extends Phaser.Scene {
   }
 
   constructor() {
-    super({ key: 'game' });
+    super({key: 'game'});
 
     this.workspace;
 
@@ -50,19 +50,19 @@ class SceneGame extends Phaser.Scene {
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
 
-    let awaitedResources = await this.stageRunner.preload();
+    const awaitedResources = await this.stageRunner.preload();
     this.load.tilemapTiledJSON('map1', awaitedResources[0]);
     this.load.image('tiles', awaitedResources[1]);
   }
 
   async create() {
-    let awaitedResources = await this.stageRunner.load();
+    const awaitedResources = await this.stageRunner.load();
 
     this.stageRunner.xmlFilePath = awaitedResources[0];
     this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
-    //await this.blocklyRunner.setCommonBlockDefinition();
+    // await this.blocklyRunner.setCommonBlockDefinition();
 
     this.stageRunner.stageConfig = awaitedResources[1];
 
@@ -86,9 +86,9 @@ class SceneGame extends Phaser.Scene {
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
     this.blocklyRunner.renderBlockly(this.startBlockly.bind(this), this.pauseBlockly.bind(this))
-      .then((space) => {
-        this.workspace = space;
-      });
+        .then((space) => {
+          this.workspace = space;
+        });
 
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
@@ -97,7 +97,7 @@ class SceneGame extends Phaser.Scene {
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
     this.backgroundLayer.setScale(this.map2Img);
-    this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
+    this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
@@ -166,18 +166,18 @@ class SceneGame extends Phaser.Scene {
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      this.player.sprite.anims.play(this.player.dir,true);
+      this.player.sprite.anims.play(this.player.dir, true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
-    }else if (this.player.targetY !== this.player.sprite.y) {
+    } else if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
       this.setDir();
       this.player.sprite.y += difY / Math.abs(difY) * 1;
-    }else{
+    } else {
       this.setDir();
     }
     if (++this.tick === this.cmdDelta) {
       this.tick = 0;
-      //向きをplayerDに揃える
+      // 向きをplayerDに揃える
       // runCodeとゴール判定を同じタイミングで行うことで、移動が完了してから(正確には次のコードを受理できるタイミングになってから)ゴール判定がなされるようにした
       // ゴール判定を満たすならばゴール処理
       // そうでなければ通常の処理
@@ -205,7 +205,7 @@ class SceneGame extends Phaser.Scene {
       } else {
         const gen = this.commandGenerator.next();
         console.log(gen.value);
-        this.workspace.highlightBlock(gen.value)
+        this.workspace.highlightBlock(gen.value);
         if (gen.done) {
           this.execMode = enumExecModeDone;
           this.blocklyRunner.endRunning();
@@ -268,7 +268,7 @@ class SceneGame extends Phaser.Scene {
   initGameField() {
     console.log('initGameField');
     this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
-    
+
 
     const playerX = this.stageRunner.stageConfig.playerX;
     const playerY = this.stageRunner.stageConfig.playerY;
@@ -301,19 +301,20 @@ class SceneGame extends Phaser.Scene {
   exitScene() {
     this.workspace.dispose();
     this.workspace = null;
+    this.execMode = enumExecModePre;
     document.getElementById('executeButton').style.visibility = 'hidden';
     document.getElementById('pauseButton').style.visibility = 'hidden';
     document.getElementById('executeButton').onclick = null;
     document.getElementById('pauseButton').onclick = null;
   };
 
-  
+
   // TODO: ここに置くべきかどうか考えておく
-  changeDir(player, dir) { //向きを変えるとかのブロックに使う
-    player.dir=dir;
+  changeDir(player, dir) { // 向きを変えるとかのブロックに使う
+    player.dir = dir;
   }
   tryMove(player, dir) {
-    this.changeDir(player,["right","left","up","down"][dir]);
+    this.changeDir(player, ['right', 'left', 'up', 'down'][dir]);
     if (dir < 0 || dir >= 4) console.error('incorrect dir in tryMove()');
 
     const dx = [1, -1, 0, 0];
