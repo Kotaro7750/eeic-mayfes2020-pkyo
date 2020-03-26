@@ -2,6 +2,43 @@
 ## タイルマップエディタの使い方
 [ここ]( https://www.mapeditor.org/ )を参照して、エディタをインストールする。
 
+## ブロックエディタの使い方
+[ブロックエディタ](https://blockly-demo.appspot.com/static/demos/blockfactory/index.html)では、カスタムブロックをGUIで作成することができる。
+
+まずはBlock Factoryで好みのブロックを作る。どのようなブロックを作るかはステージ設計と相談。できたらSaveで保存。
+
+その次にBlock ExporterでJSON形式でエクスポートする。Block Definitionsに作ったJSONが出力されるので、以下のようにBlocks.jsonに配置する。JSONチェッカーか何かで整形すると見やすくてベネ。
+
+```json
+{
+  "blocks":[
+    {
+      "name":"作ったブロックの名前",
+      "block": {
+        作ったオブジェクトをここに
+      }
+    },
+    {
+      以下同様
+    }
+  ]
+}
+```
+
+また、Blocks.jsに、
+
+```javascript
+export default {
+  blocks_作ったブロック名 : (block) => {
+    const value_num_input = block.getFieldValue('num_input');
+    return `適当なコード\n`;
+  },
+  以下同様
+};
+```
+
+と書く。
+
 ## コードへの反映
 src/stage以下に作りたいステージのディレクトリを作る。
 
@@ -29,79 +66,12 @@ stage0.button.on('pointerdown', function() {
 }.bind(this));
 ```
 
-### Blocks.jsについて
-ブロックエディタで作った関数を block_{{ブロックの名前}} という名前の関数にする。
+また、command.xmlに配置するブロックを定義する。ステージ共通ブロックも配置することを忘れずに。
 
-```javascript
-//Blocks.js
-export default {
-  block_move: (block) => {
-    const dropdownDirection = block.getFieldValue('move_direction');
-    return `this.tryMove(this.player, ${dropdownDirection});\
-                this.cmdDelta=35;\
-                yield true;\n`;
-  },
-  block_movemove: (block) => {
-    const dropdownDirection = block.getFieldValue('move_direction');
-    return `this.tryMove(this.player, ${dropdownDirection});\
-                this.cmdDelta=35;\
-                yield true;\n`;
-  },
-};
-```
-
-### Blocks.jsonについて
-ブロックエディタで作ったブロック定義JSONを以下のようにして配置する。JSONの書式に直すのがめんどくさいので、JSONチェッカーなどを使う。
-
-```json
-{
-  "blocks":[
-    {
-      "name":"move",
-      "block": {
-        "type": "move",
-        "message0": "%1 にすすむ",
-        "args0": [
-          {
-        "type": "field_dropdown",
-        "name": "move_direction",
-        "options": [
-                ["→", "0"],
-                ["←", "1"],
-                ["↑", "2"],
-                ["↓", "3"]
-              ]
-            }],
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 270,
-        "tooltip": "",
-        "helpUrl": ""
-      }
-    },
-    {
-      "name":"movemove",
-      "block": {
-        "type": "movemove",
-        "message0": "%1 にすすむといいな",
-        "args0": [
-          {
-        "type": "field_dropdown",
-        "name": "move_direction",
-        "options": [
-                ["→", "0"],
-                ["←", "1"],
-                ["↑", "2"],
-                ["↓", "3"]
-              ]
-            }],
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 500,
-        "tooltip": "",
-        "helpUrl": ""
-      }
-    }
-  ]
-}
+```xml
+ <xml>
+    <block type="loop"></block>
+    <block type="move"></block>
+    <block type="new_block"></block>
+</xml>
 ```
