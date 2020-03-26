@@ -1,4 +1,5 @@
 # 五月祭 2020 プログラミング教室 プロダクト
+![lint test](https://github.com/Kotaro7750/eeic-mayfes2020-pkyo/workflows/eslint/badge.svg)
 
 ## js 開発環境
 
