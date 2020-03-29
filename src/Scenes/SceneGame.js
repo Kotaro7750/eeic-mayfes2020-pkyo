@@ -1,7 +1,6 @@
 import Blockly from 'blockly';
 import Phaser from 'phaser';
 
-import StageRunner from '../StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
 import playerImg from '../../public/stage/ex1.png';
@@ -17,6 +16,7 @@ const enumExecModeClear = 5;
 class SceneGame extends Phaser.Scene {
   init(data) {
     this.stageDir = data.stage_dir;
+    this.stageRunner = data.stageRunner;
   }
 
   constructor() {
@@ -45,27 +45,10 @@ class SceneGame extends Phaser.Scene {
     this.blocklyRunner;
   }
 
-  async preload() {
-    this.stageRunner = new StageRunner(this.stageDir);
-    this.load.reset();
-    this.load.removeListener('complete');
-
-    // player
-    // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, { frameWidth: 32, frameHeight: 48 });
-
-    const awaitedResources = await this.stageRunner.preload();
-    this.load.tilemapTiledJSON('map-' + this.stageDir, awaitedResources[0]);
-    this.load.image('tiles-' + this.stageDir, awaitedResources[1]);
-    this.load.start();
-
-    this.load.on('complete', () => {
-      console.log("completeddd")
-    })
+  preload() {
   }
 
   async create() {
-    console.log("create");
     const awaitedResources = await this.stageRunner.load();
 
     this.stageRunner.xmlFilePath = awaitedResources[0];
@@ -107,12 +90,6 @@ class SceneGame extends Phaser.Scene {
     console.log(this.map2Img);
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
-    //this.mapDat = this.add.tilemap('map1');
-    //const tileset = this.mapDat.addTilesetImage('tileset', 'tiles');
-    //this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
-    //this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
-    //this.backgroundLayer.setScale(this.map2Img);
-    //this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
