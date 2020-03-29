@@ -312,8 +312,9 @@ class SceneGame extends Phaser.Scene {
     const dy = [0, 0, -1, 1];
     const nextGX = player.gridX + dx[dir];
     const nextGY = player.gridY + dy[dir];
-    if (this.mapDat.isWall[nextGY][nextGX]) return;
-    else {
+    if (this.mapDat.isWall[nextGY][nextGX]) {
+      return;
+    } else {
       player.targetX += dx[dir] * this.mapDat.tileWidth * this.map2Img;
       player.gridX = nextGX;
       player.targetY += dy[dir] * this.mapDat.tileHeight * this.map2Img;
