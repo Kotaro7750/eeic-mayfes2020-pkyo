@@ -50,6 +50,7 @@ class SceneGame extends Phaser.Scene {
 
 
   async preload() {
+    console.log('preload '+ this.stageDir);
     this.stageRunner=new StageRunner(this.stageDir);
 
     // player
@@ -57,11 +58,13 @@ class SceneGame extends Phaser.Scene {
     this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
 
     const awaitedResources = await this.stageRunner.preload();
-    this.load.tilemapTiledJSON('map1', awaitedResources[0]);
+    this.load.tilemapTiledJSON('map'+this.stageDir, awaitedResources[0]);
+    console.log(awaitedResources);
     this.load.image('tiles', awaitedResources[1]);
   }
 
   async create() {
+    console.log('create ' + this.stageDir);
     const awaitedResources = await this.stageRunner.load();
 
     this.stageRunner.xmlFilePath = awaitedResources[0];
@@ -99,8 +102,9 @@ class SceneGame extends Phaser.Scene {
 
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
-    this.mapDat=this.add.tilemap('map1');
+    this.mapDat=this.add.tilemap('map'+this.stageDir);
     const tileset=this.mapDat.addTilesetImage('tileset', 'tiles');
+    console.log(this.mapDat);
     this.backgroundLayer=this.mapDat.createDynamicLayer('ground', tileset);
     this.map2Img=this.game.canvas.width/this.backgroundLayer.width;
     this.backgroundLayer.setScale(this.map2Img);
