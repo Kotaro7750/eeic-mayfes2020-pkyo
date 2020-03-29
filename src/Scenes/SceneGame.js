@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import playerImg from '../../public/stage/ex1.png';
 import SimpleButton from '../Objects/Objects.js';
 
 const enumExecModePre = 1;
@@ -20,7 +19,7 @@ class SceneGame extends Phaser.Scene {
   }
 
   constructor() {
-    super({ key: 'game' });
+    super({key: 'game'});
 
     this.workspace;
 
@@ -77,9 +76,9 @@ class SceneGame extends Phaser.Scene {
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
     this.blocklyRunner.renderBlockly(this.startBlockly.bind(this), this.pauseBlockly.bind(this))
-      .then((space) => {
-        this.workspace = space;
-      });
+        .then((space) => {
+          this.workspace = space;
+        });
 
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
@@ -89,7 +88,7 @@ class SceneGame extends Phaser.Scene {
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
     console.log(this.map2Img);
     this.backgroundLayer.setScale(this.map2Img);
-    this.mapDat = { ...this.mapDat, ...this.stageRunner.stageConfig };
+    this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
@@ -101,13 +100,13 @@ class SceneGame extends Phaser.Scene {
     // これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
     this.player.sprite.scene.anims.create({
       key: 'right',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', { frames: [5, 6, 7, 8] }),
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [5, 6, 7, 8]}),
       frameRate: 7,
       repeat: -1,
     });
     this.player.sprite.scene.anims.create({
       key: 'left',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', { frames: [0, 1, 2, 3] }),
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [0, 1, 2, 3]}),
       frameRate: 7,
       repeat: -1,
     });
