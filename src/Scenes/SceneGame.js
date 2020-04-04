@@ -1,10 +1,8 @@
 import Blockly from 'blockly';
 import Phaser from 'phaser';
 
-import StageRunner from '../StageRunner';
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import playerImg from '../../public/stage/ex1.png';
 import SimpleButton from '../Objects/Objects.js';
 
 const enumExecModePre = 1;
@@ -17,6 +15,7 @@ const enumExecModeClear = 5;
 class SceneGame extends Phaser.Scene {
   init(data) {
     this.stageDir = data.stage_dir;
+    this.stageRunner = data.stageRunner;
   }
 
   constructor() {
@@ -45,16 +44,7 @@ class SceneGame extends Phaser.Scene {
     this.blocklyRunner;
   }
 
-  async preload() {
-    this.stageRunner = new StageRunner(this.stageDir);
-
-    // player
-    // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
-
-    const awaitedResources = await this.stageRunner.preload();
-    this.load.tilemapTiledJSON('map1', awaitedResources[0]);
-    this.load.image('tiles', awaitedResources[1]);
+  preload() {
   }
 
   async create() {
@@ -92,10 +82,11 @@ class SceneGame extends Phaser.Scene {
 
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
-    this.mapDat = this.add.tilemap('map1');
-    const tileset = this.mapDat.addTilesetImage('tileset', 'tiles');
+    this.mapDat = this.add.tilemap('map-' + this.stageDir);
+    const tileset = this.mapDat.addTilesetImage('tileset', 'tiles-' + this.stageDir);
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
+    console.log(this.map2Img);
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
 
@@ -321,8 +312,9 @@ class SceneGame extends Phaser.Scene {
     const dy = [0, 0, -1, 1];
     const nextGX = player.gridX + dx[dir];
     const nextGY = player.gridY + dy[dir];
-    if (this.mapDat.isWall[nextGY][nextGX]) return;
-    else {
+    if (this.mapDat.isWall[nextGY][nextGX]) {
+      return;
+    } else {
       player.targetX += dx[dir] * this.mapDat.tileWidth * this.map2Img;
       player.gridX = nextGX;
       player.targetY += dy[dir] * this.mapDat.tileHeight * this.map2Img;
