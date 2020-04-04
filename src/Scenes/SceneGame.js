@@ -1,15 +1,15 @@
-import Blockly, {defineBlocksWithJsonArray} from 'blockly';
+import Blockly from 'blockly';
 import Phaser from 'phaser';
 
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
 import SimpleButton from '../Objects/Objects.js';
 
-const enumExecModePre=1;
-const enumExecModeRun=2;
-const enumExecModePause=3;
-const enumExecModeDone=4;
-const enumExecModeClear=5;
+const enumExecModePre = 1;
+const enumExecModeRun = 2;
+const enumExecModePause = 3;
+const enumExecModeDone = 4;
+const enumExecModeClear = 5;
 
 
 class SceneGame extends Phaser.Scene {
@@ -23,8 +23,8 @@ class SceneGame extends Phaser.Scene {
     this.workspace;
 
     // game管理classのうちphaser持ち
-    this.player=new Player();
-    this.goal=new Goal();
+    this.player = new Player();
+    this.goal = new Goal();
     this.mapDat;
     this.map2Img;
 
@@ -54,27 +54,27 @@ class SceneGame extends Phaser.Scene {
     this.blocklyRunner = new BlocklyRunner(this.stageRunner.xmlFilePath);
     // await this.blocklyRunner.setCommonBlockDefinition();
 
-    this.stageRunner.stageConfig=awaitedResources[1];
+    this.stageRunner.stageConfig = awaitedResources[1];
 
-    this.stageRunner.blockDefs=awaitedResources[2];
-    this.stageRunner.blockFuncs=awaitedResources[3];
+    this.stageRunner.blockDefs = awaitedResources[2];
+    this.stageRunner.blockFuncs = awaitedResources[3];
 
     this.game.scale.setGameSize(400, 600);
     // htmlボタンを可視化する
     this.displayCircleButton();
 
-    const resetButton=document.getElementById('resetButton');
-    resetButton.onclick=this.initGameField.bind(this);
-    const backButton=document.getElementById('backButton');
-    backButton.onclick=this.backToStageSelect.bind(this);
+    const resetButton = document.getElementById('resetButton');
+    resetButton.onclick = this.initGameField.bind(this);
+    const backButton = document.getElementById('backButton');
+    backButton.onclick = this.backToStageSelect.bind(this);
     // stage固有ブロックの定義
     this.stageRunner.blockDefs.forEach((elem) => {
-      this.blocklyRunner.setBlockDefinition(elem.name, elem.block, this.stageRunner.blockFuncs.default['block_'+elem.name]);
+      this.blocklyRunner.setBlockDefinition(elem.name, elem.block, this.stageRunner.blockFuncs.default['block_' + elem.name]);
     });
 
     // blocklyのdiv.style.leftを予め調整しておく
-    const blocklyDiv=document.getElementById('blocklyDiv');
-    blocklyDiv.style.left=this.game.canvas.width;
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    blocklyDiv.style.left = this.game.canvas.width;
 
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
@@ -95,7 +95,7 @@ class SceneGame extends Phaser.Scene {
 
     // 初期位置はstageクラスに乗せるとして...（プレイヤーとマップの微妙なズレは要調整）
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
-    this.player.sprite=this.add.sprite(0, 0, 'player');
+    this.player.sprite = this.add.sprite(0, 0, 'player');
     this.player.sprite.setOrigin(0, 1);
     // プレイヤーの位置等の初期化処理をしている
     this.initGameField();
@@ -117,7 +117,7 @@ class SceneGame extends Phaser.Scene {
   }
 
   update() {
-    if (this.execMode===enumExecModeRun) this.updateOnRunning();
+    if (this.execMode === enumExecModeRun) this.updateOnRunning();
   }
 
   setDir() {
@@ -143,8 +143,8 @@ class SceneGame extends Phaser.Scene {
   updateOnRunning() {
     console.log(this.player.dir);
     // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
-    if (this.player.targetX!==this.player.sprite.x) {
-      const difX=this.player.targetX-this.player.sprite.x;
+    if (this.player.targetX !== this.player.sprite.x) {
+      const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
       this.player.sprite.anims.play(this.player.dir, true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
@@ -161,12 +161,12 @@ class SceneGame extends Phaser.Scene {
       // runCodeとゴール判定を同じタイミングで行うことで、移動が完了してから(正確には次のコードを受理できるタイミングになってから)ゴール判定がなされるようにした
       // ゴール判定を満たすならばゴール処理
       // そうでなければ通常の処理
-      if (this.goal.gridX===this.player.gridX&&this.goal.gridY===this.player.gridY) {
-        const button=new SimpleButton(this, 50, 500, 100, 50, 0x7fff7f, '次へ', 'green');
-        const buttonT=new SimpleButton(this, 50, 550, 250, 50, 0xff7f7f, 'タイトルへ', 'red');
-        const buttonS=new SimpleButton(this, 50, 450, 250, 50, 0x7f7fff, 'ステージ', 'blue');
+      if (this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY) {
+        const button = new SimpleButton(this, 50, 500, 100, 50, 0x7fff7f, '次へ', 'green');
+        const buttonT = new SimpleButton(this, 50, 550, 250, 50, 0xff7f7f, 'タイトルへ', 'red');
+        const buttonS = new SimpleButton(this, 50, 450, 250, 50, 0x7f7fff, 'ステージ', 'blue');
         // eslint-disable-next-line no-unused-vars
-        const button2=new SimpleButton(this, 50, 200, 300, 50, 0xfffff00, 'Game Clear', 'green');
+        const button2 = new SimpleButton(this, 50, 200, 300, 50, 0xfffff00, 'Game Clear', 'green');
         button.button.on('pointerdown', function() {
           // ボタン押したら次のゲームが展開されるようにしたい
           this.exitScene();
@@ -181,36 +181,36 @@ class SceneGame extends Phaser.Scene {
           this.scene.start('title');
         }.bind(this));
 
-        this.execMode=enumExecModeClear;
+        this.execMode = enumExecModeClear;
       } else {
-        const gen=this.commandGenerator.next();
+        const gen = this.commandGenerator.next();
         console.log(gen.value);
         this.workspace.highlightBlock(gen.value);
         if (gen.done) {
-          this.execMode=enumExecModeDone;
+          this.execMode = enumExecModeDone;
           this.blocklyRunner.endRunning();
         }
       }
     }
-    if (this.tick> this.cmdDelta) {
+    if (this.tick > this.cmdDelta) {
       console.error('Scene Game: tick exceeded cmdDelta');
     }
   }
 
   startBlockly() {
     console.log('start blockly');
-    if (this.execMode===enumExecModePre) {
-      this.execMode=enumExecModeRun;
+    if (this.execMode === enumExecModePre) {
+      this.execMode = enumExecModeRun;
 
       console.log(this.workspace);
-      let code=Blockly.JavaScript.workspaceToCode(this.workspace);
+      let code = Blockly.JavaScript.workspaceToCode(this.workspace);
 
       // ジェネレータに変換
-      code='(function* () {'+code+'})';
+      code = '(function* () {' + code + '})';
 
       try {
         console.log('code: ', code);
-        this.commandGenerator=eval(code).bind(this)();
+        this.commandGenerator = eval(code).bind(this)();
       } catch (err) {
         console.error(err);
       }
@@ -225,27 +225,27 @@ class SceneGame extends Phaser.Scene {
   pauseBlockly() {
     // ポーズした時の処理を入れる
     console.log('pause blockly');
-    if (this.execMode===enumExecModeRun) {
-      this.execMode=enumExecModePause;
+    if (this.execMode === enumExecModeRun) {
+      this.execMode = enumExecModePause;
       this.player.sprite.anims.stop(); // anims.stopでアニメーション停止
-    } else if (this.execMode===enumExecModePause) {
-      this.execMode=enumExecModeRun;
+    } else if (this.execMode === enumExecModePause) {
+      this.execMode = enumExecModeRun;
     }
     this.redrawPauseButton();
   };
 
   displayCircleButton() {
-    const buttons=document.getElementsByClassName('circle_button');
+    const buttons = document.getElementsByClassName('circle_button');
     for (const button of buttons) {
-      button.style.visibility='visible';
+      button.style.visibility = 'visible';
     }
   }
   redrawPauseButton() {
-    const element=document.getElementById('pauseButton');
-    if (this.execMode===enumExecModePause) {
-      element.innerHTML='restart';
+    const element = document.getElementById('pauseButton');
+    if (this.execMode === enumExecModePause) {
+      element.innerHTML = 'restart';
     } else {
-      element.innerHTML='pause';
+      element.innerHTML = 'pause';
     }
   };
 
@@ -256,30 +256,30 @@ class SceneGame extends Phaser.Scene {
     this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
 
 
-    const playerX=this.stageRunner.stageConfig.playerX;
-    const playerY=this.stageRunner.stageConfig.playerY;
-    const playerD=this.stageRunner.stageConfig.playerD;
-    const goalX=this.stageRunner.stageConfig.goalX;
-    const goalY=this.stageRunner.stageConfig.goalY;
+    const playerX = this.stageRunner.stageConfig.playerX;
+    const playerY = this.stageRunner.stageConfig.playerY;
+    const playerD = this.stageRunner.stageConfig.playerD;
+    const goalX = this.stageRunner.stageConfig.goalX;
+    const goalY = this.stageRunner.stageConfig.goalY;
 
-    this.player.sprite.x=this.mapDat.tileWidth*playerX*this.map2Img;
-    this.player.sprite.y=this.mapDat.tileWidth*(playerY+0.9)*this.map2Img;
+    this.player.sprite.x = this.mapDat.tileWidth * playerX * this.map2Img;
+    this.player.sprite.y = this.mapDat.tileWidth * (playerY + 0.9) * this.map2Img;
 
-    this.player.gridX=playerX;
-    this.player.gridY=playerY;
-    this.player.dir=playerD;
+    this.player.gridX = playerX;
+    this.player.gridY = playerY;
+    this.player.dir = playerD;
     this.setDir();// 指定した向きを向くようにしている
-    this.player.targetX=this.player.sprite.x;
-    this.player.targetY=this.player.sprite.y;
-    this.goal.gridX=goalX;
-    this.goal.gridY=goalY;
+    this.player.targetX = this.player.sprite.x;
+    this.player.targetY = this.player.sprite.y;
+    this.goal.gridX = goalX;
+    this.goal.gridY = goalY;
 
-    this.execMode=enumExecModePre;
+    this.execMode = enumExecModePre;
 
     this.redrawPauseButton();
-    this.commandGenerator=null;
-    this.cmdDelta=1;
-    this.tick=0;
+    this.commandGenerator = null;
+    this.cmdDelta = 1;
+    this.tick = 0;
   };
 
   backToStageSelect() {
@@ -289,11 +289,11 @@ class SceneGame extends Phaser.Scene {
   // シーンを終了する時は必ずこの関数を通ること
   exitScene() {
     this.workspace.dispose();
-    this.workspace=null;
-    const buttons=document.getElementsByClassName('circle_button');
+    this.workspace = null;
+    const buttons = document.getElementsByClassName('circle_button');
     for (const button of buttons) {
-      button.style.visibility='hidden';
-      button.onclick=null;
+      button.style.visibility = 'hidden';
+      button.onclick = null;
     }
   };
 
