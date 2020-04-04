@@ -1,4 +1,3 @@
-import Phaser from 'phaser';
 // ステージ依存のファイル
 // xmlのpathはwebpack後に取り出されるので
 
@@ -8,6 +7,7 @@ class StageRunner {
   }
 
   async preload() {
+    console.log('runner preload start');
     this.tileMap = import('./stage/' + this.stageDir + '/tilemap.json');
     this.tileSets = import('./stage/' + this.stageDir + '/tilesets.png');
 

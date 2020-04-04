@@ -19,14 +19,18 @@ class SceneStageSelect extends Phaser.Scene {
     // コールバックの指定
     stage0.button.on('pointerdown', function() {
       // シーンの遷移にエフェクトを加えたいならここの処理を変更する
-      this.scene.start('game', {stage_dir: 'test'});
+      this.scene.start('load', {stage_dir: 'test'});
     }.bind(this));
     backTitle.button.on('pointerdown', function() {
       this.scene.start('title');
     }.bind(this));
 
     stage1.button.on('pointerdown', function() {
+<<<<<<< HEAD
       this.scene.start('game', {stage_dir: 'stage-test'});
+=======
+      this.scene.start('load', {stage_dir: 'stage-test'});
+>>>>>>> origin/master
     }.bind(this));
   }
   update() { }

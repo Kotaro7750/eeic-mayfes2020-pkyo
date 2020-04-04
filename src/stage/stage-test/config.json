@@ -445,5 +445,10 @@
   "playerY": 7,
   "goalX": 12,
   "goalY": 7,
+<<<<<<< HEAD
   "playerD": "right"
 }
+=======
+  "playerD" : "right"
+}
+>>>>>>> origin/master

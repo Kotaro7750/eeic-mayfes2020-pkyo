@@ -26,11 +26,19 @@ def generate_config(width, not_wall_list):
     config = {}
     config['isWall']=[]
     for i in range(len(map_list)):
+<<<<<<< HEAD
         row = [True] * width
         for j in range(width):
             tile = map_list[i][j]
             if tile in not_wall_list:
                 row[j]=False
+=======
+        row = ['true'] * width
+        for j in range(width):
+            tile = map_list[i][j]
+            if tile in not_wall_list:
+                row[j]='false'
+>>>>>>> origin/master
         tmp = copy.deepcopy(row)
         config['isWall'].append(tmp)
 
