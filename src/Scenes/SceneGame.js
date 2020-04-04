@@ -14,16 +14,8 @@ const enumExecModeClear=5;
 
 class SceneGame extends Phaser.Scene {
   init(data) {
-<<<<<<< HEAD
-    this.stageDir=data.stage_dir;
-  }
-  backToStageSelect() {
-    this.exitScene();
-    this.scene.start('stage-select');
-=======
     this.stageDir = data.stage_dir;
     this.stageRunner = data.stageRunner;
->>>>>>> origin/master
   }
   constructor() {
     super({key: 'game'});
@@ -51,23 +43,7 @@ class SceneGame extends Phaser.Scene {
     this.blocklyRunner;
   }
 
-<<<<<<< HEAD
-
-  async preload() {
-    console.log('preload '+ this.stageDir);
-    this.stageRunner=new StageRunner(this.stageDir);
-
-    // player
-    // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
-
-    const awaitedResources = await this.stageRunner.preload();
-    this.load.tilemapTiledJSON('map'+this.stageDir, awaitedResources[0]);
-    console.log(awaitedResources);
-    this.load.image('tiles', awaitedResources[1]);
-=======
   preload() {
->>>>>>> origin/master
   }
 
   async create() {
@@ -109,19 +85,11 @@ class SceneGame extends Phaser.Scene {
 
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
-<<<<<<< HEAD
-    this.mapDat=this.add.tilemap('map'+this.stageDir);
-    const tileset=this.mapDat.addTilesetImage('tileset', 'tiles');
-    console.log(this.mapDat);
-    this.backgroundLayer=this.mapDat.createDynamicLayer('ground', tileset);
-    this.map2Img=this.game.canvas.width/this.backgroundLayer.width;
-=======
     this.mapDat = this.add.tilemap('map-' + this.stageDir);
     const tileset = this.mapDat.addTilesetImage('tileset', 'tiles-' + this.stageDir);
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
     this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
     console.log(this.map2Img);
->>>>>>> origin/master
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
 
@@ -314,7 +282,10 @@ class SceneGame extends Phaser.Scene {
     this.tick=0;
   };
 
-
+  backToStageSelect() {
+    this.exitScene();
+    this.scene.start('stage-select');
+  }
   // シーンを終了する時は必ずこの関数を通ること
   exitScene() {
     this.workspace.dispose();
@@ -335,18 +306,6 @@ class SceneGame extends Phaser.Scene {
     this.changeDir(player, ['right', 'left', 'up', 'down'][dir]);
     if (dir < 0 || dir >= 4) console.error('incorrect dir in tryMove()');
 
-<<<<<<< HEAD
-    const dx=[1, -1, 0, 0];
-    const dy=[0, 0, -1, 1];
-    const nextGX=player.gridX+dx[dir];
-    const nextGY=player.gridY+dy[dir];
-    if (this.mapDat.isWall[nextGY][nextGX]) return;
-    else {
-      player.targetX+=dx[dir]*this.mapDat.tileWidth*this.map2Img;
-      player.gridX=nextGX;
-      player.targetY+=dy[dir]*this.mapDat.tileHeight*this.map2Img;
-      player.gridY=nextGY;
-=======
     const dx = [1, -1, 0, 0];
     const dy = [0, 0, -1, 1];
     const nextGX = player.gridX + dx[dir];
@@ -358,7 +317,6 @@ class SceneGame extends Phaser.Scene {
       player.gridX = nextGX;
       player.targetY += dy[dir] * this.mapDat.tileHeight * this.map2Img;
       player.gridY = nextGY;
->>>>>>> origin/master
     }
   };
 }
