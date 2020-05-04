@@ -15,7 +15,9 @@ class SceneStageSelect extends Phaser.Scene {
 
     // phaserDiv内部のdivを消す
     document.querySelectorAll('#phaserDiv div').forEach((v) => {
-      phaserDiv.removeChild(v);
+      if (phaserDiv.contains(v)) {
+        phaserDiv.removeChild(v);
+      }
     });
 
 

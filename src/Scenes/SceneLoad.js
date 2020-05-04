@@ -21,7 +21,9 @@ class SceneLoad extends Phaser.Scene {
 
     const phaserDiv = document.getElementById('phaserDiv');
     document.querySelectorAll('#phaserDiv div').forEach((v) => {
-      phaserDiv.removeChild(v);
+      if (phaserDiv.contains(v)) {
+        phaserDiv.removeChild(v);
+      }
     });
 
     // player
