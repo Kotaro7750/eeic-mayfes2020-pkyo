@@ -1,15 +1,21 @@
 """
-コマンドライン引数の第1引数にmapの横幅、
-それ以降に、壁じゃないマスの番号(tilemap.jsonのlayers->dataのやつ)
+標準入力に以下の形式でマップの横幅(W),
+壁じゃないマスの番号(id_1, id_2, ...)(〇〇.tmxを見ると分かる),
+プレイヤーとゴールの座標(playerX, playerX, goalX, goalY),
+プレイヤーの向き(playerD)
 を入れてください
-例: python generate_config.py 20 497 521
+例: python generate_config.py
+16
+497 521
+5 7 10 7
+right
 """
 
 import json
 import copy
 import sys
 
-def generate_config(width, not_wall_list):
+def generate_config(width, not_wall_list, start_goal, playerD):
     filename = 'tilemap.json'
     fr = open(filename, 'r')
     tilemap_data = json.load(fr)
@@ -26,28 +32,27 @@ def generate_config(width, not_wall_list):
     config = {}
     config['isWall']=[]
     for i in range(len(map_list)):
-        row = ['true'] * width
+        row = [True] * width
         for j in range(width):
             tile = map_list[i][j]
             if tile in not_wall_list:
-                row[j]='false'
+                row[j]=False
         tmp = copy.deepcopy(row)
         config['isWall'].append(tmp)
 
-    config['playerX'] = 'playerX'
-    config['playerY'] = 'playerY'
-    config['goalX'] = 'goalX'
-    config['goalY'] = 'goalY'
-    config['playerD'] = 'playerD'
+    config['playerX'] = start_goal[0]
+    config['playerY'] = start_goal[1]
+    config['goalX'] = start_goal[2]
+    config['goalY'] = start_goal[3]
+    config['playerD'] = playerD
 
     with open('config.json','w') as fw:
         json.dump(config,fw,indent=2)
 
 if __name__ == '__main__':
     args = sys.argv
-    width = int(args[1])
-    not_wall_list = []
-    for i in range(2,len(args)):
-        not_wall_list.append(int(args[i]))
-
-    generate_config(width, not_wall_list)
+    width = int(input())
+    not_wall_list = [int(x)for x in input().split()]
+    start_goal = [int(x) for x in input().split()]
+    playerD = input()
+    generate_config(width, not_wall_list, start_goal, playerD)

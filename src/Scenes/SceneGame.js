@@ -17,7 +17,6 @@ class SceneGame extends Phaser.Scene {
     this.stageDir = data.stage_dir;
     this.stageRunner = data.stageRunner;
   }
-
   constructor() {
     super({key: 'game'});
 
@@ -48,6 +47,7 @@ class SceneGame extends Phaser.Scene {
   }
 
   async create() {
+    console.log('create ' + this.stageDir);
     const awaitedResources = await this.stageRunner.load();
 
     this.stageRunner.xmlFilePath = awaitedResources[0];
@@ -61,9 +61,12 @@ class SceneGame extends Phaser.Scene {
 
     this.game.scale.setGameSize(400, 600);
     // htmlボタンを可視化する
-    document.getElementById('executeButton').style.visibility = 'visible';
-    document.getElementById('pauseButton').style.visibility = 'visible';
+    this.displayCircleButton();
 
+    const resetButton = document.getElementById('resetButton');
+    resetButton.onclick = this.initGameField.bind(this);
+    const backButton = document.getElementById('backButton');
+    backButton.onclick = this.backToStageSelect.bind(this);
     // stage固有ブロックの定義
     this.stageRunner.blockDefs.forEach((elem) => {
       this.blocklyRunner.setBlockDefinition(elem.name, elem.block, this.stageRunner.blockFuncs.default['block_' + elem.name]);
@@ -111,20 +114,6 @@ class SceneGame extends Phaser.Scene {
       repeat: -1,
     });
     this.setDir();
-
-    // リセットボタン
-    const buttonReset = new SimpleButton(this, 300, 0, 100, 30, 0x7f7fff, 'reset', 'blue');
-    buttonReset.button.on('pointerdown', function() {
-      if (this.execMode !== enumExecModeClear) {
-        this.initGameField();
-      }
-    }.bind(this));
-    // ステージセレクトに戻る
-    const buttonBack = new SimpleButton(this, 0, 0, 100, 30, 0x7fff7f, 'back', 'green');
-    buttonBack.button.on('pointerdown', function() {
-      this.exitScene();
-      this.scene.start('stage-select');
-    }.bind(this));
   }
 
   update() {
@@ -245,6 +234,12 @@ class SceneGame extends Phaser.Scene {
     this.redrawPauseButton();
   };
 
+  displayCircleButton() {
+    const buttons = document.getElementsByClassName('circle_button');
+    for (const button of buttons) {
+      button.style.visibility = 'visible';
+    }
+  }
   redrawPauseButton() {
     const element = document.getElementById('pauseButton');
     if (this.execMode === enumExecModePause) {
@@ -287,16 +282,19 @@ class SceneGame extends Phaser.Scene {
     this.tick = 0;
   };
 
-
+  backToStageSelect() {
+    this.exitScene();
+    this.scene.start('stage-select');
+  }
   // シーンを終了する時は必ずこの関数を通ること
   exitScene() {
     this.workspace.dispose();
     this.workspace = null;
-    this.execMode = enumExecModePre;
-    document.getElementById('executeButton').style.visibility = 'hidden';
-    document.getElementById('pauseButton').style.visibility = 'hidden';
-    document.getElementById('executeButton').onclick = null;
-    document.getElementById('pauseButton').onclick = null;
+    const buttons = document.getElementsByClassName('circle_button');
+    for (const button of buttons) {
+      button.style.visibility = 'hidden';
+      button.onclick = null;
+    }
   };
 
 

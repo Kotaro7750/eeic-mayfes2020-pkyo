@@ -13,7 +13,7 @@ class SceneStageSelect extends Phaser.Scene {
     // SimpleButtonは自作class ../Objects/Objects.js に記述している
     const stage0 = new SimpleButton(this, 300, 200, 200, 50, 0xff7f7f, 'stage0', 'red');
 
-    const stage1 = new SimpleButton(this, 300, 300, 200, 50, 0xff7f7f, 'stage1', 'blue');
+    const stage1 = new SimpleButton(this, 300, 300, 200, 50, 0xff7f7f, 'stage-test', 'blue');
     const backTitle = new SimpleButton(this, 300, 400, 200, 50, 0xffff7f, 'Title', 'black');
 
     // コールバックの指定
