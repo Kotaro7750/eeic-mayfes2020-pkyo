@@ -175,3 +175,31 @@ h1 {
 	opacity: 1;
 	transform: scale(1, 1);
 }
+
+/* accordion */
+.accordion-check {
+	display: none;
+}
+.accordion-label {
+	background-color: #333333;
+	color: #fff;
+	display: block;
+	width: auto;
+	height: auto;
+	margin-bottom: 1px;
+	padding: 10px;
+}
+.accordion-content {
+	border: 1px solid #333;
+	height: 0;
+	opacity: 0;
+	padding: 0 10px;
+	transition: 0.5s;
+	visibility: hidden;
+}
+.accordion-check:checked + .accordion-label + .accordion-content {
+	max-height: 1980px;
+	opacity: 1;
+	padding: 10px;
+	visibility: visible;
+}

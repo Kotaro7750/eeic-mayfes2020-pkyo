@@ -20,12 +20,27 @@ class SceneStageSelect extends Phaser.Scene {
       }
     });
 
+    const stageDiv = document.createElement('div');
+    stageDiv.style.position = 'absolute';
+    stageDiv.style.width = 'auto';
+    stageDiv.style.left = '0px';
+    stageDiv.style.top = '0px';
+    stageDiv.style.paddingLeft = '300px';
+    stageDiv.style.paddingRight = '300px';
+    stageDiv.style.paddingTop = '200px';
+    phaserDiv.appendChild(stageDiv);
 
-    // SimpleButtonは自作class ../Objects/Objects.js に記述している
-    const stage0 = new SimpleButton(phaserDiv, this, 300, 200, 'stage_button', 'stageselect_stage0', 200, 50, 'red', 'STAGE 0', 'white');
-    phaserDiv.appendChild(stage0.button);
-    const stage1 = new SimpleButton(phaserDiv, this, 300, 300, 'stage_button', 'stageselect_stage1', 200, 50, 'blue', 'STAGE 1', 'white');
-    const backTitle = new SimpleButton(phaserDiv, this, 300, 400, 'stage_button', 'stageselect_stage2', 200, 50, 'black', 'Title', 'white');
+    const stage0 = new SimpleButton(stageDiv, this, 300, 200, 'stage_button', 'stageselect_stage0', 200, 50, 'red', 'STAGE 0', 'white');
+    const stage1 = new SimpleButton(stageDiv, this, 300, 300, 'stage_button', 'stageselect_stage1', 200, 50, 'blue', 'STAGE 1', 'white');
+
+    const backTitle = document.createElement('div');
+    backTitle.setAttribute('class', 'simple-button-div');
+    backTitle.setAttribute('id', 'stageselect_backtotitle');
+    backTitle.style.width = 'auto';
+    backTitle.style.backgroundColor = '#333333';
+    backTitle.style.color = 'white';
+    backTitle.innerHTML = 'タイトルへ戻る';
+    stageDiv.appendChild(backTitle);
 
     // コールバックの指定
     stage0.button.addEventListener('click', function() {
@@ -36,7 +51,7 @@ class SceneStageSelect extends Phaser.Scene {
     stage1.button.addEventListener('click', function() {
       this.scene.start('load', {stage_dir: 'stage-test'});
     }.bind(this));
-    backTitle.button.addEventListener('click', function() {
+    backTitle.addEventListener('click', function() {
       this.scene.start('title');
     }.bind(this));
   }
