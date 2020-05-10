@@ -1,6 +1,5 @@
  <xml>
     <block type="loop"></block>
     <block type="move"></block>
-    <block type="movemove"></block>
-    <block type="new_block"></block>
+    <block type="turn"></block>
 </xml>

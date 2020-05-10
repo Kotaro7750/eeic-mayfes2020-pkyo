@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import SimpleButton from '../Objects/Objects.js';
+import {SimpleButton} from '../Objects/Objects.js';
+import stageList from '../stage/stageList';
 
 class SceneStageSelect extends Phaser.Scene {
   constructor() {
@@ -20,18 +21,24 @@ class SceneStageSelect extends Phaser.Scene {
       }
     });
 
+    const width = this.sys.game.canvas.width;
+
     const stageDiv = document.createElement('div');
     stageDiv.style.position = 'absolute';
     stageDiv.style.width = 'auto';
     stageDiv.style.left = '0px';
     stageDiv.style.top = '0px';
-    stageDiv.style.paddingLeft = '300px';
-    stageDiv.style.paddingRight = '300px';
+    stageDiv.style.paddingLeft = '50px';
+    stageDiv.style.paddingRight = '50px';
     stageDiv.style.paddingTop = '200px';
     phaserDiv.appendChild(stageDiv);
 
-    const stage0 = new SimpleButton(stageDiv, this, 300, 200, 'stage_button', 'stageselect_stage0', 200, 50, 'red', 'STAGE 0', 'white');
-    const stage1 = new SimpleButton(stageDiv, this, 300, 300, 'stage_button', 'stageselect_stage1', 200, 50, 'blue', 'STAGE 1', 'white');
+    stageList.forEach((stage, i) => {
+      const stageButton = new SimpleButton(stageDiv, this, 300, 100 * (i + 2), 'stage_button', 'stageselect' + stage.id, width - 100, 'red', stage.title, 'white');
+      stageButton.button.addEventListener('click', function() {
+        this.scene.start('load', {stage_dir: stage.id});
+      }.bind(this));
+    });
 
     const backTitle = document.createElement('div');
     backTitle.setAttribute('class', 'simple-button-div');
@@ -43,15 +50,8 @@ class SceneStageSelect extends Phaser.Scene {
     stageDiv.appendChild(backTitle);
 
     // コールバックの指定
-    stage0.button.addEventListener('click', function() {
-      // シーンの遷移時にエフェクトを加えたいならここの処理を変更する
-      this.scene.start('load', {stage_dir: 'test'});
-    }.bind(this));
-
-    stage1.button.addEventListener('click', function() {
-      this.scene.start('load', {stage_dir: 'stage-test'});
-    }.bind(this));
     backTitle.addEventListener('click', function() {
+      // シーンの遷移時にエフェクトを加えたいならここの処理を変更する
       this.scene.start('title');
     }.bind(this));
   }

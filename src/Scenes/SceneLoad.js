@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import StageRunner from '../StageRunner';
-import playerImg from '../../public/stage/ex1.png';
+import playerImg from '../stage/obake.png';
 
 class SceneLoad extends Phaser.Scene {
   constructor() {
@@ -28,7 +28,7 @@ class SceneLoad extends Phaser.Scene {
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
+    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 32});
 
     const awaitedResources = await this.stageRunner.preload();
     this.load.tilemapTiledJSON('map-' + this.stageDir, awaitedResources[0]);

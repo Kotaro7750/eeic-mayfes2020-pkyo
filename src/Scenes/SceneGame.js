@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import SimpleButton from '../Objects/Objects.js';
+import {FlipButton} from '../Objects/Objects.js';
 
 const enumExecModePre = 1;
 const enumExecModeRun = 2;
@@ -41,6 +41,13 @@ class SceneGame extends Phaser.Scene {
     this.stageRunner;
     // blocklyrunner class
     this.blocklyRunner;
+    // for button
+    this.phaserDiv = document.getElementById('phaserDiv');
+    document.querySelectorAll('#phaserDiv div').forEach((v) => {
+      if (this.phaserDiv.contains(v)) {
+        this.phaserDiv.removeChild(v);
+      }
+    });
   }
 
   preload() {
@@ -103,13 +110,25 @@ class SceneGame extends Phaser.Scene {
     // これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
     this.player.sprite.scene.anims.create({
       key: 'right',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [5, 6, 7, 8]}),
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [5, 6, 7]}),
       frameRate: 7,
       repeat: -1,
     });
     this.player.sprite.scene.anims.create({
       key: 'left',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [0, 1, 2, 3]}),
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [3, 4, 5]}),
+      frameRate: 7,
+      repeat: -1,
+    });
+    this.player.sprite.scene.anims.create({
+      key: 'up',
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [9, 10, 11]}),
+      frameRate: 7,
+      repeat: -1,
+    });
+    this.player.sprite.scene.anims.create({
+      key: 'down',
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', { frames: [0, 1, 2] }),
       frameRate: 7,
       repeat: -1,
     });
@@ -123,16 +142,16 @@ class SceneGame extends Phaser.Scene {
   setDir() {
     switch (this.player.dir) {
       case 'down':
-        this.player.sprite.setFrame(4);
+        this.player.sprite.setFrame(0);
         break;
       case 'up':
         this.player.sprite.setFrame(9);
         break;
       case 'right':
-        this.player.sprite.setFrame(5);
+        this.player.sprite.setFrame(6);
         break;
       case 'left':
-        this.player.sprite.setFrame(0);
+        this.player.sprite.setFrame(3);
         break;
       default:
         console.error('incorrect dir in setDir()');
@@ -162,21 +181,24 @@ class SceneGame extends Phaser.Scene {
       // ゴール判定を満たすならばゴール処理
       // そうでなければ通常の処理
       if (this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY) {
-        const button = new SimpleButton(this, 50, 500, 100, 50, 0x7fff7f, '次へ', 'green');
-        const buttonT = new SimpleButton(this, 50, 550, 250, 50, 0xff7f7f, 'タイトルへ', 'red');
-        const buttonS = new SimpleButton(this, 50, 450, 250, 50, 0x7f7fff, 'ステージ', 'blue');
-        // eslint-disable-next-line no-unused-vars
-        const button2 = new SimpleButton(this, 50, 200, 300, 50, 0xfffff00, 'Game Clear', 'green');
-        button.button.on('pointerdown', function() {
-          // ボタン押したら次のゲームが展開されるようにしたい
+        const phaserDiv = document.getElementById('phaserDiv');
+
+        // TODO: ゲームクリアという表示を出す
+
+        const button = new FlipButton(phaserDiv, '次へ', 50, 500, 100, 50);
+        const buttonT = new FlipButton(phaserDiv, 'タイトルへ', 50, 550, 250, 50);
+        const buttonS = new FlipButton(phaserDiv, 'ステージ', 50, 450, 250, 50);
+
+        button.button.addEventListener('click', function() {
+          // TODO: ボタン押したら次のゲームが展開されるようにしたい
           this.exitScene();
           this.scene.start('次のゲーム');
         }.bind(this));
-        buttonS.button.on('pointerdown', function() {
+        buttonS.button.addEventListener('click', function() {
           this.exitScene();
           this.scene.start('stage-select');
         }.bind(this));
-        buttonT.button.on('pointerdown', function() {
+        buttonT.button.addEventListener('click', function() {
           this.exitScene();
           this.scene.start('title');
         }.bind(this));

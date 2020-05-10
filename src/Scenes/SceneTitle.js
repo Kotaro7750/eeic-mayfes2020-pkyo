@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import SimpleButton from '../Objects/Objects.js';
+import {FlipButton} from '../Objects/Objects';
 
 class SceneTitle extends Phaser.Scene {
   constructor() {
@@ -20,16 +20,10 @@ class SceneTitle extends Phaser.Scene {
     });
 
     // START button
-    const titleBtn0 = document.createElement('div');
-    titleBtn0.setAttribute('class', 'title-box');
-    const titleBtn1 = document.createElement('div');
-    titleBtn1.setAttribute('class', 'title-button');
-    titleBtn1.innerHTML = 'START';
-    titleBtn0.appendChild(titleBtn1);
-    phaserDiv.appendChild(titleBtn0);
+    const titleBtn = new FlipButton(phaserDiv, 'START', 300, 200, 200, 50);
 
     // コールバックの指定
-    titleBtn0.addEventListener('click', function() {
+    titleBtn.button.addEventListener('click', function() {
       // シーンの遷移にエフェクトを加えたいならここの処理を変更する
       this.scene.start('stage-select');
     }.bind(this));

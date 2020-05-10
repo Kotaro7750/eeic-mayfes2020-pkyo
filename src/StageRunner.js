@@ -7,7 +7,7 @@ class StageRunner {
   }
 
   async preload() {
-    console.log('runner preload start');
+    console.log('runner preload start:', this.stageDir);
     this.tileMap = import('./stage/' + this.stageDir + '/tilemap.json');
     this.tileSets = import('./stage/' + this.stageDir + '/tilesets.png');
 
