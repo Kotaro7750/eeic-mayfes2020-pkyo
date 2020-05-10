@@ -41,13 +41,6 @@ class SceneGame extends Phaser.Scene {
     this.stageRunner;
     // blocklyrunner class
     this.blocklyRunner;
-    // for button
-    this.phaserDiv = document.getElementById('phaserDiv');
-    document.querySelectorAll('#phaserDiv div').forEach((v) => {
-      if (this.phaserDiv.contains(v)) {
-        this.phaserDiv.removeChild(v);
-      }
-    });
   }
 
   preload() {
@@ -225,6 +218,12 @@ class SceneGame extends Phaser.Scene {
       this.execMode = enumExecModeRun;
 
       console.log(this.workspace);
+      // メインループ以外のルートブロックの削除
+      this.workspace.getTopBlocks().forEach(function(block) {
+        if (block.id !== this.blocklyRunner.rootBlockId) {
+          block.dispose(false);
+        }
+      }.bind(this));
       let code = Blockly.JavaScript.workspaceToCode(this.workspace);
 
       // ジェネレータに変換
@@ -302,6 +301,15 @@ class SceneGame extends Phaser.Scene {
     this.commandGenerator = null;
     this.cmdDelta = 1;
     this.tick = 0;
+
+    // ゲームクリアを考慮し、phaserDiv内の整理
+    // for button
+    this.phaserDiv = document.getElementById('phaserDiv');
+    document.querySelectorAll('#phaserDiv div').forEach((v) => {
+      if (this.phaserDiv.contains(v)) {
+        this.phaserDiv.removeChild(v);
+      }
+    });
   };
 
   backToStageSelect() {

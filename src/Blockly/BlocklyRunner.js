@@ -70,6 +70,11 @@ class BlocklyRunner {
     console.log(this.workspace);
     Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'), this.workspace);
 
+    this.workspace.getTopBlocks().forEach((block) => {
+      block.setMovable(false);
+      this.rootBlockId = block.id;
+    });
+
     const executeButton = document.getElementById('executeButton');
     executeButton.onclick = startBlockly;
     const pauseButton = document.getElementById('pauseButton');
