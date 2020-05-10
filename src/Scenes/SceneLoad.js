@@ -19,13 +19,6 @@ class SceneLoad extends Phaser.Scene {
     this.load.reset();
     this.load.removeListener('complete');
 
-    const phaserDiv = document.getElementById('phaserDiv');
-    document.querySelectorAll('#phaserDiv div').forEach((v) => {
-      if (phaserDiv.contains(v)) {
-        phaserDiv.removeChild(v);
-      }
-    });
-
     // player
     // TODO playerImgだけは動的importしてない
     this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 32});

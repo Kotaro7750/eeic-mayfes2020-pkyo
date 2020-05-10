@@ -60,13 +60,7 @@ class SceneGame extends Phaser.Scene {
     this.stageRunner.blockFuncs = awaitedResources[3];
 
     this.game.scale.setGameSize(400, 600);
-    // htmlボタンを可視化する
-    this.displayCircleButton();
 
-    const resetButton = document.getElementById('resetButton');
-    resetButton.onclick = this.initGameField.bind(this);
-    const backButton = document.getElementById('backButton');
-    backButton.onclick = this.backToStageSelect.bind(this);
     // stage固有ブロックの定義
     this.stageRunner.blockDefs.forEach((elem) => {
       this.blocklyRunner.setBlockDefinition(elem.name, elem.block, this.stageRunner.blockFuncs.default['block_' + elem.name]);
@@ -82,7 +76,6 @@ class SceneGame extends Phaser.Scene {
         .then((space) => {
           this.workspace = space;
         });
-
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
     this.mapDat = this.add.tilemap('map-' + this.stageDir);
@@ -121,11 +114,16 @@ class SceneGame extends Phaser.Scene {
     });
     this.player.sprite.scene.anims.create({
       key: 'down',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', { frames: [0, 1, 2] }),
+      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [0, 1, 2]}),
       frameRate: 7,
       repeat: -1,
     });
     this.setDir();
+
+    const resetButton = document.getElementById('resetButton');
+    resetButton.onclick = this.initGameField.bind(this);
+    const backButton = document.getElementById('backButton');
+    backButton.onclick = this.backToStageSelect.bind(this);
   }
 
   update() {
@@ -255,12 +253,6 @@ class SceneGame extends Phaser.Scene {
     this.redrawPauseButton();
   };
 
-  displayCircleButton() {
-    const buttons = document.getElementsByClassName('circle_button');
-    for (const button of buttons) {
-      button.style.visibility = 'visible';
-    }
-  }
   redrawPauseButton() {
     const element = document.getElementById('pauseButton');
     if (this.execMode === enumExecModePause) {
@@ -297,19 +289,44 @@ class SceneGame extends Phaser.Scene {
 
     this.execMode = enumExecModePre;
 
-    this.redrawPauseButton();
     this.commandGenerator = null;
     this.cmdDelta = 1;
     this.tick = 0;
 
     // ゲームクリアを考慮し、phaserDiv内の整理
-    // for button
     this.phaserDiv = document.getElementById('phaserDiv');
     document.querySelectorAll('#phaserDiv div').forEach((v) => {
       if (this.phaserDiv.contains(v)) {
         this.phaserDiv.removeChild(v);
       }
     });
+    const executeButton = document.createElement('div');
+    executeButton.setAttribute('id', 'executeButton');
+    executeButton.setAttribute('class', 'circle_button');
+    const executeIcon = document.createElement('i');
+    executeIcon.setAttribute('class', 'fas fa-chevron-circle-left');
+    executeButton.appendChild(executeIcon);
+    phaserDiv.appendChild(executeButton);
+
+    const pauseButton = document.createElement('div');
+    pauseButton.setAttribute('id', 'pauseButton');
+    pauseButton.setAttribute('class', 'circle_button');
+    pauseButton.innerHTML = 'pause';
+    phaserDiv.appendChild(pauseButton);
+
+    const resetButton = document.createElement('div');
+    resetButton.setAttribute('id', 'resetButton');
+    resetButton.setAttribute('class', 'circle_button');
+    resetButton.innerHTML = 'reset';
+    phaserDiv.appendChild(resetButton);
+
+    const backButton = document.createElement('div');
+    backButton.setAttribute('id', 'backButton');
+    backButton.setAttribute('class', 'circle_button');
+    backButton.innerHTML = 'back';
+    phaserDiv.appendChild(backButton);
+
+    this.redrawPauseButton();
   };
 
   backToStageSelect() {
@@ -320,11 +337,6 @@ class SceneGame extends Phaser.Scene {
   exitScene() {
     this.workspace.dispose();
     this.workspace = null;
-    const buttons = document.getElementsByClassName('circle_button');
-    for (const button of buttons) {
-      button.style.visibility = 'hidden';
-      button.onclick = null;
-    }
   };
 
 
