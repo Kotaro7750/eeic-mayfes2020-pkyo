@@ -25,8 +25,8 @@ class BlocklyRunner {
     Blockly.defineBlocksWithJsonArray([
       init,
     ]);
-    Blockly.JavaScript[name] = (name) => {
-      return conv(name);
+    Blockly.JavaScript[name] = (v) => {
+      return conv(v);
     };
   }
 
