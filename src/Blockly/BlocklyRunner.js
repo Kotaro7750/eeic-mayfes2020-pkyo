@@ -37,7 +37,7 @@ class BlocklyRunner {
     });
   }
 
-  async renderBlockly(startBlockly, pauseBlockly, maxBlocks) {
+  async renderBlockly(maxBlocks) {
     console.log(this.xmlFilePath);
     const xmlFile = await this.getFile(this.xmlFilePath);
     console.log(xmlFile);
@@ -74,11 +74,6 @@ class BlocklyRunner {
       block.setMovable(false);
       this.rootBlockId = block.id;
     });
-
-    const executeButton = document.getElementById('executeButton');
-    executeButton.onclick = startBlockly;
-    const pauseButton = document.getElementById('pauseButton');
-    pauseButton.onclick = pauseBlockly;
     return this.workspace;
   }
 

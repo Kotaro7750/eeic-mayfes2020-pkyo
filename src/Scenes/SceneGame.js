@@ -72,7 +72,7 @@ class SceneGame extends Phaser.Scene {
 
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
-    this.blocklyRunner.renderBlockly(this.startBlockly.bind(this), this.pauseBlockly.bind(this))
+    this.blocklyRunner.renderBlockly(this.stageRunner.stageConfig.maxBlock)
         .then((space) => {
           this.workspace = space;
         });
@@ -302,12 +302,14 @@ class SceneGame extends Phaser.Scene {
     executeIcon.setAttribute('class', 'fas fa-chevron-circle-left');
     executeButton.appendChild(executeIcon);
     phaserDiv.appendChild(executeButton);
+    executeButton.onclick = this.startBlockly.bind(this);
 
     const pauseButton = document.createElement('div');
     pauseButton.setAttribute('id', 'pauseButton');
     pauseButton.setAttribute('class', 'circle_button');
     pauseButton.innerHTML = 'pause';
     phaserDiv.appendChild(pauseButton);
+    pauseButton.onclick = this.pauseBlockly.bind(this);
 
     const resetButton = document.createElement('div');
     resetButton.setAttribute('id', 'resetButton');
