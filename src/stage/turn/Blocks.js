@@ -32,16 +32,16 @@ export default {
     {
       switch (this.player.dir) {
         case 'left':
-          this.player.dir = '${turnDirection ? 'down' : 'up'}';
+          this.player.dir = '${turnDirection === '1' ? 'down' : 'up'}';
           break;
         case 'right':
-          this.player.dir = '${turnDirection ? 'up' : 'down'}';
+          this.player.dir = '${turnDirection === '1' ? 'up' : 'down'}';
           break;
         case 'up':
-          this.player.dir = '${turnDirection ? 'left' : 'right'}';
+          this.player.dir = '${turnDirection === '1' ? 'left' : 'right'}';
           break;
         case 'down':
-          this.player.dir = '${turnDirection ? 'right' : 'left'}';
+          this.player.dir = '${turnDirection === '1' ? 'right' : 'left'}';
       }
       this.cmdDelta = 35;
       yield "${block.id.replace('"', '\\"')}";

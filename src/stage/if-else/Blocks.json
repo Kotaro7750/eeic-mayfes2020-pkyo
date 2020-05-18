@@ -22,11 +22,11 @@
           "name": "turn_direction",
           "options": [
             [
-              "左",
+              "右",
               "0"
             ],
             [
-              "右",
+              "左",
               "1"
             ]
           ]
@@ -40,10 +40,35 @@
     }
   },
   {
-    "name": "ifwall",
+    "name": "ifwallfront",
     "block": {
-      "type": "ifwall",
+      "type": "ifwallfront",
       "message0": "正面が壁なら実行: %1",
+      "args0": [
+        {
+          "type": "input_statement",
+          "name": "IF"
+        }
+      ],
+      "message1": "そうでないなら実行: %1",
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "ELSE"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": 720,
+      "tooltip": "",
+      "helpUrl": ""
+    }
+  },
+  {
+    "name": "ifwallright",
+    "block": {
+      "type": "ifwallright",
+      "message0": "右側が壁なら実行: %1",
       "args0": [
         {
           "type": "input_statement",

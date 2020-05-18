@@ -2,5 +2,6 @@
     <block type="loop"></block>
     <block type="move"></block>
     <block type="turn"></block>
-    <block type="ifwall"></block>
+    <block type="ifwallfront"></block>
+    <block type="ifwallright"></block>
 </xml>
