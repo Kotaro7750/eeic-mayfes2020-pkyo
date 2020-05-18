@@ -119,11 +119,6 @@ class SceneGame extends Phaser.Scene {
       repeat: -1,
     });
     this.setDir();
-
-    const resetButton = document.getElementById('resetButton');
-    resetButton.onclick = this.initGameField.bind(this);
-    const backButton = document.getElementById('backButton');
-    backButton.onclick = this.backToStageSelect.bind(this);
   }
 
   update() {
@@ -319,12 +314,15 @@ class SceneGame extends Phaser.Scene {
     resetButton.setAttribute('class', 'circle_button');
     resetButton.innerHTML = 'reset';
     phaserDiv.appendChild(resetButton);
+    resetButton.onclick = this.initGameField.bind(this);
 
     const backButton = document.createElement('div');
     backButton.setAttribute('id', 'backButton');
     backButton.setAttribute('class', 'circle_button');
     backButton.innerHTML = 'back';
     phaserDiv.appendChild(backButton);
+    backButton.onclick = this.backToStageSelect.bind(this);
+
 
     this.redrawPauseButton();
   };
