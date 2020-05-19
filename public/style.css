@@ -194,6 +194,7 @@ h1 {
 	visibility: hidden;
 }
 .accordion-check:checked + .accordion-label + .accordion-content {
+	height: auto;
 	max-height: 1980px;
 	opacity: 1;
 	padding: 10px;

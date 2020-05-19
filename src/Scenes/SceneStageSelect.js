@@ -36,7 +36,7 @@ class SceneStageSelect extends Phaser.Scene {
     stageList.forEach((stage, i) => {
       const stageButton = new SimpleButton(stageDiv, this, 300, 100 * (i + 2), 'stage_button', 'stageselect' + stage.id, width - 100, 'red', stage.title, 'white');
       stageButton.button.addEventListener('click', function() {
-        this.scene.start('load', {stage_dir: stage.id});
+        this.scene.start('load', {stage_dir: stage.id, idx: i});
       }.bind(this));
     });
 
@@ -46,7 +46,7 @@ class SceneStageSelect extends Phaser.Scene {
     backTitle.style.width = 'auto';
     backTitle.style.backgroundColor = '#333333';
     backTitle.style.color = 'white';
-    backTitle.innerHTML = 'タイトルへ戻る';
+    backTitle.innerHTML = 'タイトルへ<ruby>戻<rp>(</rp><rt>もど</rt><rp>)</rp></ruby>る';
     stageDiv.appendChild(backTitle);
 
     // コールバックの指定

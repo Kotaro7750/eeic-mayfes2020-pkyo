@@ -12,6 +12,7 @@ class SceneLoad extends Phaser.Scene {
 
   init(data) {
     this.stageDir = data.stage_dir;
+    this.idx = data.idx;
   }
 
   async preload() {
@@ -32,7 +33,7 @@ class SceneLoad extends Phaser.Scene {
       this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner});
     } else {
       this.load.on('complete', () => {
-        this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner});
+        this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner, idx: this.idx});
       });
     }
   }

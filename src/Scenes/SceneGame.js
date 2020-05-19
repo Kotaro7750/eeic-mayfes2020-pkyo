@@ -1,5 +1,6 @@
 import Blockly from 'blockly';
 import Phaser from 'phaser';
+import stageList from '../stage/stageList';
 
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
@@ -16,6 +17,7 @@ class SceneGame extends Phaser.Scene {
   init(data) {
     this.stageDir = data.stage_dir;
     this.stageRunner = data.stageRunner;
+    this.idx = data.idx;
   }
   constructor() {
     super({key: 'game'});
@@ -178,7 +180,11 @@ class SceneGame extends Phaser.Scene {
         button.button.addEventListener('click', function() {
           // TODO: ボタン押したら次のゲームが展開されるようにしたい
           this.exitScene();
-          this.scene.start('次のゲーム');
+          if (stageList.length == this.idx + 1) {
+            this.scene.start('stage-select');
+          } else {
+            this.scene.start('load', {stage_dir: stageList[this.idx + 1].id, idx: this.idx + 1});
+          }
         }.bind(this));
         buttonS.button.addEventListener('click', function() {
           this.exitScene();

@@ -27,7 +27,7 @@ export class SimpleButton {
 
     this.button = document.createElement('div');
     this.button.setAttribute('class', 'accordion-content');
-    this.button.innerHTML = 'ゲームを始める';
+    this.button.innerHTML = 'ゲームを<ruby>始<rp>(</rp><rt>はじ</rt><rp>)</rp></ruby>める';
     this.stage.appendChild(this.button);
   }
 };
