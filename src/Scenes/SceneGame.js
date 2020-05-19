@@ -230,30 +230,35 @@ class SceneGame extends Phaser.Scene {
       }
 
       this.blocklyRunner.updateBlockly();
+      this.redrawPauseButton();
       return this.commandGenerator;
-    } else {
-      return null;
-    }
-  };
-
-  pauseBlockly() {
-    // ポーズした時の処理を入れる
-    console.log('pause blockly');
-    if (this.execMode === enumExecModeRun) {
+    } else if (this.execMode == enumExecModeRun) {
       this.execMode = enumExecModePause;
-      this.player.sprite.anims.stop(); // anims.stopでアニメーション停止
+      this.player.sprite.anims.stop();
     } else if (this.execMode === enumExecModePause) {
       this.execMode = enumExecModeRun;
     }
     this.redrawPauseButton();
+    return null;
   };
 
   redrawPauseButton() {
-    const element = document.getElementById('pauseButton');
-    if (this.execMode === enumExecModePause) {
-      element.innerHTML = 'restart';
+    console.log("redraw:", this.execMode);
+    const element = document.getElementById('executeButton');
+    if (this.execMode === enumExecModePause || this.execMode === enumExecModePre) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      const playIcon = document.createElement('i');
+      playIcon.setAttribute('class', 'fas fa-play-circle');
+      element.appendChild(playIcon);
     } else {
-      element.innerHTML = 'pause';
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      const pauseIcon = document.createElement('i');
+      pauseIcon.setAttribute('class', 'fas fa-pause-circle');
+      element.appendChild(pauseIcon);
     }
   };
 
@@ -299,22 +304,17 @@ class SceneGame extends Phaser.Scene {
     executeButton.setAttribute('id', 'executeButton');
     executeButton.setAttribute('class', 'circle_button');
     const executeIcon = document.createElement('i');
-    executeIcon.setAttribute('class', 'fas fa-chevron-circle-left');
+    executeIcon.setAttribute('class', 'fas fa-play-circle');
     executeButton.appendChild(executeIcon);
     phaserDiv.appendChild(executeButton);
     executeButton.onclick = this.startBlockly.bind(this);
 
-    const pauseButton = document.createElement('div');
-    pauseButton.setAttribute('id', 'pauseButton');
-    pauseButton.setAttribute('class', 'circle_button');
-    pauseButton.innerHTML = 'pause';
-    phaserDiv.appendChild(pauseButton);
-    pauseButton.onclick = this.pauseBlockly.bind(this);
-
     const resetButton = document.createElement('div');
     resetButton.setAttribute('id', 'resetButton');
     resetButton.setAttribute('class', 'circle_button');
-    resetButton.innerHTML = 'reset';
+    const resetIcon = document.createElement('i');
+    resetIcon.setAttribute('class', 'fas fa-stop-circle');
+    resetButton.appendChild(resetIcon);
     phaserDiv.appendChild(resetButton);
     resetButton.onclick = this.initGameField.bind(this);
 

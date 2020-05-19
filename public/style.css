@@ -36,8 +36,8 @@ h1 {
 
 #resetButton{
 	position: absolute;
-	left: 340px;
-	top: 30px;
+	left: 480px;
+	top: 540px;
 	z-index:1;
 	background: rgb(235, 12, 12);
 }
@@ -48,7 +48,7 @@ h1 {
 #backButton{
 	position: absolute;
 	left: 30px;
-	top: 30px;
+	top: 540px;
 	z-index:1;
 	background: rgb(8, 37, 206);
 }
@@ -59,7 +59,7 @@ h1 {
 #executeButton {
   position: absolute;
   left: 420px;
-  top: 550px;
+  top: 540px;
   z-index: 1;
   color: #fff;
   background: #40C659;
