@@ -249,7 +249,6 @@ class SceneGame extends Phaser.Scene {
   };
 
   redrawPauseButton() {
-    console.log("redraw:", this.execMode);
     const element = document.getElementById('executeButton');
     if (this.execMode === enumExecModePause || this.execMode === enumExecModePre) {
       while (element.firstChild) {
