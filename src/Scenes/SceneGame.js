@@ -1,4 +1,4 @@
-import Blockly from 'blockly';
+import Blockly, { Block } from 'blockly';
 import Phaser from 'phaser';
 import stageList from '../stage/stageList';
 
@@ -61,29 +61,53 @@ class SceneGame extends Phaser.Scene {
     this.stageRunner.blockDefs = awaitedResources[2];
     this.stageRunner.blockFuncs = awaitedResources[3];
 
-    this.game.scale.setGameSize(400, 600);
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.game.scale.setGameSize(this.width / 2, this.height);
+
+    // blocklyのdiv.style.leftを予め調整しておく
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    blocklyDiv.style.left = this.width / 2 + 'px';
+    blocklyDiv.style.top = '10px';
+    blocklyDiv.style.width = this.width / 2 + 'px';
+    blocklyDiv.style.height = this.height;
+
+    window.onresize = function() {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+      const halfWidth = this.width / 2;
+
+      this.game.scale.setGameSize(halfWidth, this.height);
+      console.log(this.backgroundLayer);
+      this.map2Img = this.height / this.backgroundLayer.height;
+      this.backgroundLayer.setScale(this.map2Img);
+      this.initGameField();
+
+      blocklyDiv.left = halfWidth + 'px';
+      blocklyDiv.top = '10px';
+      blocklyDiv.style.width = halfWidth + 'px';
+      blocklyDiv.style.height = this.height + 'px';
+      Blockly.svgResize(this.workspace);
+    }.bind(this);
 
     // stage固有ブロックの定義
     this.stageRunner.blockDefs.forEach((elem) => {
       this.blocklyRunner.setBlockDefinition(elem.name, elem.block, this.stageRunner.blockFuncs.default['block_' + elem.name]);
     });
 
-    // blocklyのdiv.style.leftを予め調整しておく
-    const blocklyDiv = document.getElementById('blocklyDiv');
-    blocklyDiv.style.left = this.game.canvas.width;
-
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
     this.blocklyRunner.renderBlockly(this.stageRunner.stageConfig.maxBlock)
         .then((space) => {
           this.workspace = space;
+          window.onresize(); // ここでinitgamefieldを呼んでしまっているのよくない
         });
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
     this.mapDat = this.add.tilemap('map-' + this.stageDir);
     const tileset = this.mapDat.addTilesetImage('tileset', 'tiles-' + this.stageDir);
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
-    this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
+    this.map2Img = this.game.canvas.height / this.backgroundLayer.height;
     console.log(this.map2Img);
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
@@ -216,7 +240,6 @@ class SceneGame extends Phaser.Scene {
     if (this.execMode === enumExecModePre) {
       this.execMode = enumExecModeRun;
 
-      console.log(this.workspace);
       // メインループ以外のルートブロックの削除
       this.workspace.getTopBlocks().forEach(function(block) {
         if (block.id !== this.blocklyRunner.rootBlockId) {
@@ -273,7 +296,6 @@ class SceneGame extends Phaser.Scene {
     console.log('initGameField');
     this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
 
-
     const playerX = this.stageRunner.stageConfig.playerX;
     const playerY = this.stageRunner.stageConfig.playerY;
     const playerD = this.stageRunner.stageConfig.playerD;
@@ -305,6 +327,11 @@ class SceneGame extends Phaser.Scene {
         this.phaserDiv.removeChild(v);
       }
     });
+    const messageDiv = document.createElement('div');
+    messageDiv.setAttribute('class', 'message-box');
+    messageDiv.innerHTML = stageList[this.idx].message;
+    phaserDiv.appendChild(messageDiv);
+
     const executeButton = document.createElement('div');
     executeButton.setAttribute('id', 'executeButton');
     executeButton.setAttribute('class', 'circle_button');
@@ -329,7 +356,6 @@ class SceneGame extends Phaser.Scene {
     backButton.innerHTML = 'back';
     phaserDiv.appendChild(backButton);
     backButton.onclick = this.backToStageSelect.bind(this);
-
 
     this.redrawPauseButton();
   };

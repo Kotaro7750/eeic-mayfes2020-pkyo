@@ -8,7 +8,15 @@ class SceneStageSelect extends Phaser.Scene {
   }
   preload() { }
   create() {
-    this.game.scale.setGameSize(800, 600);
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.game.scale.setGameSize(this.width, this.height);
+    window.onresize = () => {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+      this.game.scale.setGameSize(this.width, this.height);
+    };
+
     this.add.text(200, 50, 'Very Very Cool\nStage Select', {fontSize: 50, color: 'white'});
 
     // 全体統一のdiv
@@ -34,7 +42,7 @@ class SceneStageSelect extends Phaser.Scene {
     phaserDiv.appendChild(stageDiv);
 
     stageList.forEach((stage, i) => {
-      const stageButton = new SimpleButton(stageDiv, this, 300, 100 * (i + 2), 'stage_button', 'stageselect' + stage.id, width - 100, 'red', stage.title, 'white');
+      const stageButton = new SimpleButton(stageDiv, this, 50, 100 * (i + 2), 'stage_button', 'stageselect' + stage.id, this.width - 100, 'red', stage.title, 'white');
       stageButton.button.addEventListener('click', function() {
         this.scene.start('load', {stage_dir: stage.id, idx: i});
       }.bind(this));

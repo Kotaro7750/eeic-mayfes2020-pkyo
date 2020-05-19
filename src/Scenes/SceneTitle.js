@@ -9,7 +9,15 @@ class SceneTitle extends Phaser.Scene {
   preload() { }
 
   create() {
-    this.game.scale.setGameSize(800, 600);
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.game.scale.setGameSize(this.width, this.height);
+    window.onresize = () => {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+      this.game.scale.setGameSize(this.width, this.height);
+    };
+
     this.add.text(200, 50, 'Apple', {fontSize: 50, color: 'red'});
 
     const phaserDiv = document.getElementById('phaserDiv');
@@ -20,7 +28,7 @@ class SceneTitle extends Phaser.Scene {
     });
 
     // START button
-    const titleBtn = new FlipButton(phaserDiv, 'START', 300, 200, 200, 50);
+    const titleBtn = new FlipButton(phaserDiv, 'START', (this.width - 200) / 2, (this.height - 50) / 2, 200, 50);
 
     // コールバックの指定
     titleBtn.button.addEventListener('click', function() {
