@@ -100,16 +100,17 @@ class SceneGame extends Phaser.Scene {
     // コールバック関数を渡す時はちゃんとbindする
     this.blocklyRunner.renderBlockly(this.stageRunner.stageConfig.maxBlock)
         .then((space) => {
+          this.leftBlock = this.stageRunner.stageConfig.maxBlock;
           this.workspace = space;
           this.workspace.addChangeListener(function(event) {
             console.log(event);
             if (event.type === Blockly.Events.BLOCK_CREATE) {
-              this.stageRunner.stageConfig.maxBlock -= 1;
+              this.leftBlock -= 1;
             } else if (event.type === Blockly.Events.BLOCK_DELETE) {
-              this.stageRunner.stageConfig.maxBlock += event.ids.length;
+              this.leftBlock += event.ids.length;
             }
             const numFrame = document.getElementById('numFrame');
-            numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.stageRunner.stageConfig.maxBlock}`;
+            numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.leftBlock}`;
           }.bind(this));
           window.onresize(); // ここでinitgamefieldを呼んでしまっているのよくない
         });
@@ -398,7 +399,7 @@ class SceneGame extends Phaser.Scene {
     numFrame.style.top = (this.height - 50) + 'px';
     numFrame.style.width = '200px';
     numFrame.style.zIndex = 1;
-    numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.stageRunner.stageConfig.maxBlock}`;
+    numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.leftBlock}`;
     phaserDiv.appendChild(numFrame);
 
     this.redrawPauseButton();

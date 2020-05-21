@@ -1,0 +1,7 @@
+ <xml>
+    <block type="loop"></block>
+    <block type="move"></block>
+    <block type="turn"></block>
+    <block type="ifelse"></block>
+    <block type="iswallfront"></block>
+</xml>
