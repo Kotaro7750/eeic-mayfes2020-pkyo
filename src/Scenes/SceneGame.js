@@ -1,4 +1,4 @@
-import Blockly, { Block } from 'blockly';
+import Blockly from 'blockly';
 import Phaser from 'phaser';
 import stageList from '../stage/stageList';
 
@@ -75,17 +75,18 @@ class SceneGame extends Phaser.Scene {
     window.onresize = function() {
       this.width = window.innerWidth;
       this.height = window.innerHeight;
-      const halfWidth = this.width / 2;
+      this.map2Img = Math.min(this.height / this.backgroundLayer.height, this.width, this.backgroundLayer.width);
+      this.width = this.backgroundLayer.width * this.map2Img;
+      this.height = this.backgroundLayer.height * this.map2Img;
+      this.game.scale.setGameSize(this.width, this.height);
 
-      this.game.scale.setGameSize(halfWidth, this.height);
-      console.log(this.backgroundLayer);
-      this.map2Img = this.height / this.backgroundLayer.height;
       this.backgroundLayer.setScale(this.map2Img);
       this.initGameField();
+      console.log(this.width);
 
-      blocklyDiv.left = halfWidth + 'px';
-      blocklyDiv.top = '10px';
-      blocklyDiv.style.width = halfWidth + 'px';
+      blocklyDiv.style.left = this.width + 'px';
+      blocklyDiv.style.top = '10px';
+      blocklyDiv.style.width = (window.innerWidth - this.width) + 'px';
       blocklyDiv.style.height = this.height + 'px';
       Blockly.svgResize(this.workspace);
     }.bind(this);
@@ -172,19 +173,18 @@ class SceneGame extends Phaser.Scene {
 
   // 実行中の処理を行うパート
   updateOnRunning() {
-    console.log(this.player.dir);
     // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
+    this.setDir();
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
       this.player.sprite.anims.play(this.player.dir, true);
       this.player.sprite.x += difX / Math.abs(difX) * 1;
-    } else if (this.player.targetY !== this.player.sprite.y) {
+    }
+    if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
-      this.setDir();
+      this.player.sprite.anims.play(this.player.dir, true);
       this.player.sprite.y += difY / Math.abs(difY) * 1;
-    } else {
-      this.setDir();
     }
     if (++this.tick === this.cmdDelta) {
       this.tick = 0;
@@ -327,34 +327,59 @@ class SceneGame extends Phaser.Scene {
         this.phaserDiv.removeChild(v);
       }
     });
+    const messageFrame = document.createElement('div');
+    messageFrame.style.position = 'absolute';
+    messageFrame.style.left = '5px';
+    messageFrame.style.top = (this.height - 150) + 'px';
+    messageFrame.style.width = (this.width - 10) + 'px';
+    messageFrame.style.height = '140px';
     const messageDiv = document.createElement('div');
     messageDiv.setAttribute('class', 'message-box');
-    messageDiv.innerHTML = stageList[this.idx].message;
-    phaserDiv.appendChild(messageDiv);
+    const messageText = document.createElement('div');
+    messageText.setAttribute('class', 'message-box-text');
+    messageText.innerHTML = stageList[this.idx].message;
+    messageDiv.appendChild(messageText);
+    messageFrame.appendChild(messageDiv);
+    phaserDiv.appendChild(messageFrame);
 
+    const executeFrame = document.createElement('div');
+    executeFrame.style.position = 'absolute';
+    executeFrame.style.left = '10px';
+    executeFrame.style.top = '90px';
     const executeButton = document.createElement('div');
     executeButton.setAttribute('id', 'executeButton');
     executeButton.setAttribute('class', 'circle_button');
     const executeIcon = document.createElement('i');
     executeIcon.setAttribute('class', 'fas fa-play-circle');
     executeButton.appendChild(executeIcon);
-    phaserDiv.appendChild(executeButton);
+    executeFrame.appendChild(executeButton);
+    messageFrame.appendChild(executeFrame);
     executeButton.onclick = this.startBlockly.bind(this);
 
+    const resetFrame = document.createElement('div');
+    resetFrame.style.position = 'absolute';
+    resetFrame.style.left = '70px';
+    resetFrame.style.top = '90px';
     const resetButton = document.createElement('div');
     resetButton.setAttribute('id', 'resetButton');
     resetButton.setAttribute('class', 'circle_button');
     const resetIcon = document.createElement('i');
     resetIcon.setAttribute('class', 'fas fa-stop-circle');
     resetButton.appendChild(resetIcon);
-    phaserDiv.appendChild(resetButton);
+    resetFrame.appendChild(resetButton);
+    messageFrame.appendChild(resetFrame);
     resetButton.onclick = this.initGameField.bind(this);
 
+    const backFrame = document.createElement('div');
+    backFrame.style.position = 'absolute';
+    backFrame.style.left = (this.width - 70) + 'px';
+    backFrame.style.top = '90px';
     const backButton = document.createElement('div');
     backButton.setAttribute('id', 'backButton');
     backButton.setAttribute('class', 'circle_button');
     backButton.innerHTML = 'back';
-    phaserDiv.appendChild(backButton);
+    backFrame.appendChild(backButton);
+    messageFrame.appendChild(backFrame);
     backButton.onclick = this.backToStageSelect.bind(this);
 
     this.redrawPauseButton();

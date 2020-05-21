@@ -36,8 +36,6 @@ h1 {
 
 #resetButton{
 	position: absolute;
-	left: 480px;
-	top: 540px;
 	z-index:1;
 	background: rgb(235, 12, 12);
 }
@@ -47,9 +45,7 @@ h1 {
 
 #backButton{
 	position: absolute;
-	left: 30px;
-	top: 540px;
-	z-index:1;
+	z-index: 1;
 	background: rgb(8, 37, 206);
 }
 #backButton::after{
@@ -58,8 +54,6 @@ h1 {
 
 #executeButton {
   position: absolute;
-  left: 420px;
-  top: 540px;
   z-index: 1;
   color: #fff;
   background: #40C659;
@@ -202,12 +196,13 @@ h1 {
 }
 
 /* message box */
+.message-box-text {
+	overflow: scroll;
+	height: 85px;
+}
 .message-box {
-	position: absolute;
-	left: 5px;
-	top: 420px;
-	width: 370px;
-	height: auto;
+	width: auto;
+	height: 100%;
 	z-index: 2;
 	background: #fff0cd;
 	box-shadow: 0px 0px 0px 5px #fff0cd;

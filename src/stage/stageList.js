@@ -14,6 +14,11 @@ const stageList = [
     title: '<ruby>条件<rp>(</rp><rt>じょうけん</rt><rp>)</rp></ruby>を<ruby>分<rp>(</rp><rt>わ</rt><rp>)</rp></ruby>けてみよう！',
     message: '<ruby>右手<rp>(</rp><rt>みぎて</rt><rp>)</rp></ruby>を<ruby>壁<rp>(</rp><rt>かべ</rt><rp>)</rp></ruby>につけたまま<ruby>進<rp>(</rp><rt>すす</rt><rp>)</rp></ruby>んでみよう！',
   },
+  {
+    id: 'hole',
+    title: '<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby>に<ruby>気<rp>(</rp><rt>き</rt><rp>)</rp></ruby>を<ruby>付<rp>(</rp><rt>つ</rt><rp>)</rp></ruby>けよう！',
+    message: '<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby>の<ruby>前<rp>(</rp><rt>まえ</rt><rp>)</rp></ruby>でジャンプしてみよう！',
+  },
 ];
 
 export default stageList;

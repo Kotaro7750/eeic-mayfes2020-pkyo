@@ -5,4 +5,6 @@
     <block type="ifelse"></block>
     <block type="iswallfront"></block>
     <block type="iswallright"></block>
+    <block type="fronthole"></block>
+    <block type="jumphole"></block>
 </xml>

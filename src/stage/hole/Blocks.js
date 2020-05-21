@@ -16,8 +16,7 @@ export default {
       console.log(this.player);
       const nextGX = this.player.gridX + dx[dir];
       const nextGY = this.player.gridY + dy[dir];
-      if (!this.mapDat.isWall[nextGY][nextGX]) {
-        console.log('move', dx[dir] * this.mapDat.tileWidth * this.map2Img, dy[dir] * this.mapDat.tileHeight * this.map2Img);
+      if (this.mapDat.mapStr[nextGY][nextGX] !== '#') {
         this.player.targetX += dx[dir] * this.mapDat.tileWidth * this.map2Img;
         this.player.gridX = nextGX;
         this.player.targetY += dy[dir] * this.mapDat.tileHeight * this.map2Img;
@@ -25,6 +24,10 @@ export default {
       }
       this.cmdDelta = 35;
       yield "${block.id.replace('"', '\\"')}";
+
+      if (this.mapDat.mapStr[this.player.gridY][this.player.gridX] == 'H') {
+        return null;
+      }
     }
     `;
   },
@@ -61,7 +64,7 @@ export default {
         ${codeElse}
       }
       this.cmdDelta = 35;
-      yield true;
+      yield "${block.id.replace('"', '\\"')}";
     }`;
   },
   block_iswallfront: (block) => {
@@ -78,7 +81,7 @@ export default {
       const dy = [0, 0, -1, 1];
       const nextGX = this.player.gridX + dx[dir];
       const nextGY = this.player.gridY + dy[dir];
-      return this.mapDat.isWall[nextGY][nextGX];
+      return this.mapDat.mapStr[nextGY][nextGX] === '#';
     }.bind(this))()
     `;
   },
@@ -97,8 +100,59 @@ export default {
       const rightDir = [3, 2, 0, 1][dir];
       const nextGX = this.player.gridX + dx[rightDir];
       const nextGY = this.player.gridY + dy[rightDir];
-      return this.mapDat.isWall[nextGY][nextGX];
+      return this.mapDat.mapStr[nextGY][nextGX] === '#';
     }.bind(this))()
+    `;
+  },
+  block_fronthole: (block) => {
+    return `
+    (function() {
+      const dirToNum = {
+        right: 0,
+        left: 1,
+        up: 2,
+        down: 3
+      };
+      const dir = dirToNum[this.player.dir];
+      const dx = [1, -1, 0, 0];
+      const dy = [0, 0, -1, 1];
+      const nextGX = this.player.gridX + dx[dir];
+      const nextGY = this.player.gridY + dy[dir];
+      return this.mapDat.mapStr[nextGY][nextGX] === 'H';
+    }.bind(this))()
+    `;
+  },
+  block_jumphole: (block) => {
+    return `
+    {
+      const dirToNum = {
+        right: 0,
+        left: 1,
+        up: 2,
+        down: 3
+      };
+      const dir = dirToNum[this.player.dir];
+      const dx = [1, -1, 0, 0];
+      const dy = [0, 0, -1, 1];
+      const nextGX = this.player.gridX + dx[dir];
+      const nextGY = this.player.gridY + dy[dir];
+      if (this.mapDat.mapStr[nextGY][nextGX] === 'H') {
+        const targetX = nextGX + dx[dir];
+        const targetY = nextGY + dy[dir];
+        if (this.mapDat.mapStr[targetY][targetX] !== '#') {
+          this.player.targetX += 2 * dx[dir] * this.mapDat.tileWidth * this.map2Img;
+          this.player.gridX = targetX;
+          this.player.targetY += 2 * dy[dir] * this.mapDat.tileHeight * this.map2Img;
+          this.player.gridY = targetY;
+        }
+      }
+      this.cmdDelta = 35;
+      yield "${block.id.replace('"', '\\"')}";
+
+      if (this.mapDat.mapStr[this.player.gridY][this.player.gridX] == 'H') {
+        return null;
+      }
+    }
     `;
   },
 };

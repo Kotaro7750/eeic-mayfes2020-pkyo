@@ -34,7 +34,7 @@
       ],
       "previousStatement": null,
       "nextStatement": null,
-      "colour": 500,
+      "colour": 270,
       "tooltip": "",
       "helpUrl": ""
     }
@@ -86,6 +86,29 @@
       "message0": "右側が壁",
       "output": null,
       "colour": 893,
+      "tooltip": "",
+      "helpUrl": ""
+    }
+  },
+  {
+    "name": "fronthole",
+    "block": {
+      "type": "fronthole",
+      "message0": "正面に落とし穴がある",
+      "output": null,
+      "colour": 893,
+      "tooltip": "",
+      "helpUrl": ""
+    }
+  },
+  {
+    "name": "jumphole",
+    "block": {
+      "type": "jumphole",
+      "message0": "正面の落とし穴を飛び越える",
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": 270,
       "tooltip": "",
       "helpUrl": ""
     }
