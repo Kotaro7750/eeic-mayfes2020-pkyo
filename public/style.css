@@ -21,14 +21,14 @@ h1 {
 
 #phaserDiv {
   position: absolute;
-  left: 10px;
-  top: 10px;
+  left: 0px;
+  top: 0px;
 }
 
 #blocklyDiv {
   position: absolute;
   left: 400px;
-  top: 10px;
+  top: 0px;
   width: 400px;
   height: 600px;
   z-index: 0;

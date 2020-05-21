@@ -8,12 +8,12 @@ class SceneStageSelect extends Phaser.Scene {
   }
   preload() { }
   create() {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.width = document.documentElement.clientWidth;
+    this.height = document.documentElement.clientHeight;
     this.game.scale.setGameSize(this.width, this.height);
     window.onresize = () => {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
+      this.width = document.documentElement.clientWidth;
+      this.height = document.documentElement.clientHeight;
       this.game.scale.setGameSize(this.width, this.height);
     };
 

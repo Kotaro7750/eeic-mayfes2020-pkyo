@@ -61,20 +61,20 @@ class SceneGame extends Phaser.Scene {
     this.stageRunner.blockDefs = awaitedResources[2];
     this.stageRunner.blockFuncs = awaitedResources[3];
 
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+    this.width = document.documentElement.clientWidth;
+    this.height = document.documentElement.clientHeight;
     this.game.scale.setGameSize(this.width / 2, this.height);
 
     // blocklyのdiv.style.leftを予め調整しておく
     const blocklyDiv = document.getElementById('blocklyDiv');
     blocklyDiv.style.left = this.width / 2 + 'px';
-    blocklyDiv.style.top = '10px';
+    blocklyDiv.style.top = '0px';
     blocklyDiv.style.width = this.width / 2 + 'px';
     blocklyDiv.style.height = this.height;
 
     window.onresize = function() {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
+      this.width = document.documentElement.clientWidth;
+      this.height = document.documentElement.clientHeight;
       this.map2Img = Math.min(this.height / this.backgroundLayer.height, this.width, this.backgroundLayer.width);
       this.width = this.backgroundLayer.width * this.map2Img;
       this.height = this.backgroundLayer.height * this.map2Img;
@@ -86,8 +86,8 @@ class SceneGame extends Phaser.Scene {
       console.log(this.width);
 
       blocklyDiv.style.left = this.width + 'px';
-      blocklyDiv.style.top = '10px';
-      blocklyDiv.style.width = (window.innerWidth - this.width) + 'px';
+      blocklyDiv.style.top = '0px';
+      blocklyDiv.style.width = (document.documentElement.clientWidth - this.width) + 'px';
       blocklyDiv.style.height = this.height + 'px';
       Blockly.svgResize(this.workspace);
     }.bind(this);
