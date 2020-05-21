@@ -22,7 +22,6 @@ class BlocklyRunner {
   }
 
   setBlockDefinition(name, init, conv) {
-    console.log(name, init, conv);
     Blockly.defineBlocksWithJsonArray([
       init,
     ]);

@@ -197,7 +197,7 @@ h1 {
 
 /* message box */
 .message-box-text {
-	overflow: scroll;
+	overflow-y: scroll;
 	height: 85px;
 }
 .message-box {

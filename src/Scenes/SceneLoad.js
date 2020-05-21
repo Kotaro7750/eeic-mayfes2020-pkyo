@@ -7,6 +7,7 @@ class SceneLoad extends Phaser.Scene {
     super({key: 'load'});
 
     this.stageDir;
+    this.idx;
     this.stageRunner;
   }
 
@@ -30,7 +31,7 @@ class SceneLoad extends Phaser.Scene {
     this.load.start();
 
     if (this.cache.tilemap.exists('map-' + this.stageDir) && this.load.textureManager.exists('tiles-' + this.stageDir) && this.load.textureManager.exists('player')) {
-      this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner});
+      this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner, idx: this.idx});
     } else {
       this.load.on('complete', () => {
         this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner, idx: this.idx});

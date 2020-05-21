@@ -79,6 +79,7 @@ class SceneGame extends Phaser.Scene {
       this.width = this.backgroundLayer.width * this.map2Img;
       this.height = this.backgroundLayer.height * this.map2Img;
       this.game.scale.setGameSize(this.width, this.height);
+      this.player.sprite.setScale(this.map2Img / 1.7);
 
       this.backgroundLayer.setScale(this.map2Img);
       this.initGameField();
@@ -109,7 +110,6 @@ class SceneGame extends Phaser.Scene {
     const tileset = this.mapDat.addTilesetImage('tileset', 'tiles-' + this.stageDir);
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
     this.map2Img = this.game.canvas.height / this.backgroundLayer.height;
-    console.log(this.map2Img);
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
 
@@ -117,6 +117,7 @@ class SceneGame extends Phaser.Scene {
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
     this.player.sprite = this.add.sprite(0, 0, 'player');
     this.player.sprite.setOrigin(0, 1);
+    this.player.sprite.setScale(this.map2Img / 1.5);
     // プレイヤーの位置等の初期化処理をしている
     this.initGameField();
     // ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)

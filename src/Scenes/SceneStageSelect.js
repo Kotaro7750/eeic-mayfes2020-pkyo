@@ -29,10 +29,9 @@ class SceneStageSelect extends Phaser.Scene {
       }
     });
 
-    const width = this.sys.game.canvas.width;
-
     const stageDiv = document.createElement('div');
     stageDiv.style.position = 'absolute';
+    stageDiv.style.overflowY = 'scroll';
     stageDiv.style.width = 'auto';
     stageDiv.style.left = '0px';
     stageDiv.style.top = '0px';
@@ -42,7 +41,7 @@ class SceneStageSelect extends Phaser.Scene {
     phaserDiv.appendChild(stageDiv);
 
     stageList.forEach((stage, i) => {
-      const stageButton = new SimpleButton(stageDiv, this, 50, 100 * (i + 2), 'stage_button', 'stageselect' + stage.id, this.width - 100, 'red', stage.title, 'white');
+      const stageButton = new SimpleButton(stageDiv, this, 0, 100 * i, 'stage_button', 'stageselect' + stage.id, this.width - 100, 'red', stage.title, 'white');
       stageButton.button.addEventListener('click', function() {
         this.scene.start('load', {stage_dir: stage.id, idx: i});
       }.bind(this));
