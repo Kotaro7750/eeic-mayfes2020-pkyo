@@ -83,7 +83,6 @@ class SceneGame extends Phaser.Scene {
 
       this.backgroundLayer.setScale(this.map2Img);
       this.initGameField();
-      console.log(this.width);
 
       blocklyDiv.style.left = this.width + 'px';
       blocklyDiv.style.top = '0px';
@@ -102,6 +101,16 @@ class SceneGame extends Phaser.Scene {
     this.blocklyRunner.renderBlockly(this.stageRunner.stageConfig.maxBlock)
         .then((space) => {
           this.workspace = space;
+          this.workspace.addChangeListener(function(event) {
+            console.log(event);
+            if (event.type === Blockly.Events.BLOCK_CREATE) {
+              this.stageRunner.stageConfig.maxBlock -= 1;
+            } else if (event.type === Blockly.Events.BLOCK_DELETE) {
+              this.stageRunner.stageConfig.maxBlock += event.ids.length;
+            }
+            const numFrame = document.getElementById('numFrame');
+            numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.stageRunner.stageConfig.maxBlock}`;
+          }.bind(this));
           window.onresize(); // ここでinitgamefieldを呼んでしまっているのよくない
         });
 
@@ -294,7 +303,6 @@ class SceneGame extends Phaser.Scene {
   // playerの位置を初期位置に戻す
   // TODO: ここ冗長そう（constructorと同様の処理を書くのはアです）←まとめました
   initGameField() {
-    console.log('initGameField');
     this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
 
     const playerX = this.stageRunner.stageConfig.playerX;
@@ -382,6 +390,16 @@ class SceneGame extends Phaser.Scene {
     backFrame.appendChild(backButton);
     messageFrame.appendChild(backFrame);
     backButton.onclick = this.backToStageSelect.bind(this);
+
+    const numFrame = document.createElement('div');
+    numFrame.setAttribute('id', 'numFrame');
+    numFrame.style.position = 'absolute';
+    numFrame.style.left = (this.width + 20) + 'px';
+    numFrame.style.top = (this.height - 50) + 'px';
+    numFrame.style.width = '200px';
+    numFrame.style.zIndex = 1;
+    numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.stageRunner.stageConfig.maxBlock}`;
+    phaserDiv.appendChild(numFrame);
 
     this.redrawPauseButton();
   };

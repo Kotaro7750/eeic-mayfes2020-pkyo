@@ -30,5 +30,5 @@
     "goalX": 10,
     "goalY": 12,
     "playerD" : "right",
-    "maxBlock": 3
+    "maxBlock": 10
 }
