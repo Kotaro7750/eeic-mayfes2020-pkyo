@@ -392,12 +392,18 @@ class SceneGame extends Phaser.Scene {
     messageFrame.appendChild(backFrame);
     backButton.onclick = this.backToStageSelect.bind(this);
 
+    const blocklyFlyout = document.querySelectorAll('.blocklyFlyout');
     const numFrame = document.createElement('div');
     numFrame.setAttribute('id', 'numFrame');
+    numFrame.setAttribute('class', 'numFrame');
     numFrame.style.position = 'absolute';
-    numFrame.style.left = (this.width + 20) + 'px';
+    numFrame.style.left = (this.width) + 'px';
     numFrame.style.top = (this.height - 50) + 'px';
-    numFrame.style.width = '200px';
+    numFrame.style.textAlign = 'center';
+    numFrame.style.lineHeight = '50px';
+    numFrame.style.width = (blocklyFlyout.length > 1 ? blocklyFlyout[1].width.baseVal.valueAsString + 'px' : '200px');
+    numFrame.style.height = '50px';
+    numFrame.style.backgroundColor = '#e4e4e4';
     numFrame.style.zIndex = 1;
     numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.leftBlock}`;
     phaserDiv.appendChild(numFrame);
