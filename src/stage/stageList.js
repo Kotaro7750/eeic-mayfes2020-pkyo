@@ -24,6 +24,11 @@ const stageList = [
     title: '<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby>に<ruby>気<rp>(</rp><rt>き</rt><rp>)</rp></ruby>を<ruby>付<rp>(</rp><rt>つ</rt><rp>)</rp></ruby>けよう！',
     message: '<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby>の<ruby>前<rp>(</rp><rt>まえ</rt><rp>)</rp></ruby>でジャンプしてみよう！',
   },
+  {
+    id: 'function-basic',
+    title: '<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby><ruby>付<rp>(</rp><rt>つ</rt><rp>)</rp></ruby>き<ruby>迷路<rp>(</rp><rt>めいろ</rt><rp>)</rp></ruby>',
+    message: '<ruby>右手<rp>(</rp><rt>みぎて</rt><rp>)</rp></ruby>を<ruby>壁<rp>(</rp><rt>かべ</rt><rp>)</rp></ruby>につけたまま、<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby>の<ruby>前<rp>(</rp><rt>まえ</rt><rp>)</rp></ruby>でジャンプするんだけど...',
+  },
 ];
 
 export default stageList;

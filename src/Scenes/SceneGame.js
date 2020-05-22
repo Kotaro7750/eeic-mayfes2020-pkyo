@@ -178,7 +178,7 @@ class SceneGame extends Phaser.Scene {
         this.player.sprite.setFrame(3);
         break;
       default:
-        console.error('incorrect dir in setDir()');
+        console.log('incorrect dir in setDir()');
     }
   };
 
@@ -242,7 +242,7 @@ class SceneGame extends Phaser.Scene {
       }
     }
     if (this.tick > this.cmdDelta) {
-      console.error('Scene Game: tick exceeded cmdDelta');
+      console.log('Scene Game: tick exceeded cmdDelta');
     }
   }
 
@@ -266,7 +266,7 @@ class SceneGame extends Phaser.Scene {
         console.log('code: ', code);
         this.commandGenerator = eval(code).bind(this)();
       } catch (err) {
-        console.error(err);
+        console.log(err);
       }
 
       this.blocklyRunner.updateBlockly();
@@ -422,7 +422,7 @@ class SceneGame extends Phaser.Scene {
   }
   tryMove(player, dir) {
     this.changeDir(player, ['right', 'left', 'up', 'down'][dir]);
-    if (dir < 0 || dir >= 4) console.error('incorrect dir in tryMove()');
+    if (dir < 0 || dir >= 4) console.log('incorrect dir in tryMove()');
 
     const dx = [1, -1, 0, 0];
     const dy = [0, 0, -1, 1];
