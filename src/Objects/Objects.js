@@ -1,6 +1,6 @@
 // 汎用オブジェクトの定義を記述する(ボタンなど、シーンによらず使えるもの)
 
-// 最早決してシンプルではない
+// 最早決してシンプルではない: ステージ詳細記述用
 // button(this.stage)をクリックすると、accordion(this.content)が出現。
 // その中にステージ開始ボタン(this.button)が含まれる
 export class SimpleButton {
@@ -33,9 +33,13 @@ export class SimpleButton {
     this.image.setAttribute('src', img);
     this.content.appendChild(this.image);
 
+    this.buttonFrame = document.createElement('div');
+    this.buttonFrame.setAttribute('class', 'title-box');
     this.button = document.createElement('div');
+    this.button.setAttribute('class', 'title-button');
     this.button.innerHTML = 'ゲームを<ruby>始<rp>(</rp><rt>はじ</rt><rp>)</rp></ruby>める';
-    this.content.appendChild(this.button);
+    this.buttonFrame.appendChild(this.button);
+    this.content.appendChild(this.buttonFrame);
   }
 };
 
@@ -45,13 +49,15 @@ export class FlipButton {
     this.div.style.position = 'absolute';
     this.div.style.left = left + 'px';
     this.div.style.top = top + 'px';
-    this.div.style.width = width + 'px';
-    this.div.style.height = height + 'px';
     this.frame = document.createElement('div');
     this.frame.setAttribute('class', 'title-box');
     this.button = document.createElement('div');
     this.button.setAttribute('class', 'title-button');
-    this.button.innerHTML = text;
+    this.content = document.createElement('div');
+    this.content.style.width = width + 'px';
+    this.content.style.height = height + 'px';
+    this.content.innerHTML = text;
+    this.button.appendChild(this.content);
     this.div.appendChild(this.frame);
     this.frame.appendChild(this.button);
     parent.appendChild(this.div);

@@ -119,9 +119,8 @@ h1 {
 /* title button */
 .title-box {
 	background-color: #ff6766;
-	position: absolute;
-	width: 100%;
-	height: 100%;
+	width: auto;
+	height: auto;
 }
 .title-button {
 	line-height: 50px;
@@ -186,6 +185,10 @@ h1 {
 	padding: 0 10px;
 	transition: 0.5s;
 	visibility: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
 }
 .accordion-check:checked + .accordion-label + .accordion-content {
 	height: auto;

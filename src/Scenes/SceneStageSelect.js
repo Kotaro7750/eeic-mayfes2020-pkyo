@@ -17,6 +17,7 @@ class SceneStageSelect extends Phaser.Scene {
       this.width = document.documentElement.clientWidth;
       this.height = document.documentElement.clientHeight;
       this.game.scale.setGameSize(this.width, this.height);
+      this.stageDiv.style.height = (this.height - 200) + 'px';
     };
 
     this.add.text(200, 50, 'Very Very Cool\nStage Select', {fontSize: 50, color: 'white'});
@@ -31,19 +32,20 @@ class SceneStageSelect extends Phaser.Scene {
       }
     });
 
-    const stageDiv = document.createElement('div');
-    stageDiv.style.position = 'absolute';
-    stageDiv.style.overflowY = 'scroll';
-    stageDiv.style.width = 'auto';
-    stageDiv.style.left = '0px';
-    stageDiv.style.top = '0px';
-    stageDiv.style.paddingLeft = '50px';
-    stageDiv.style.paddingRight = '50px';
-    stageDiv.style.paddingTop = '200px';
-    phaserDiv.appendChild(stageDiv);
+    this.stageDiv = document.createElement('div');
+    this.stageDiv.style.position = 'absolute';
+    this.stageDiv.style.overflowY = 'scroll';
+    this.stageDiv.style.width = 'auto';
+    this.stageDiv.style.height = (this.height - 200) + 'px';
+    this.stageDiv.overflowY = 'scroll';
+    this.stageDiv.style.left = '0px';
+    this.stageDiv.style.top = '200px';
+    this.stageDiv.style.paddingLeft = '50px';
+    this.stageDiv.style.paddingRight = '50px';
+    phaserDiv.appendChild(this.stageDiv);
 
     stageList.forEach((stage, i) => {
-      const stageButton = new SimpleButton(stageDiv, this, 0, 100 * i, 'stage_button', 'stageselect' + stage.id, this.width - 100, 'red', stage.title, 'white', '/stage/' + stage.id + '.png');
+      const stageButton = new SimpleButton(this.stageDiv, this, 0, 100 * i, 'stage_button', 'stageselect' + stage.id, this.width - 100, 'red', stage.title, 'white', '/stage/' + stage.id + '.png');
       stageButton.button.addEventListener('click', function() {
         this.scene.start('load', {stage_dir: stage.id, idx: i});
       }.bind(this));
@@ -56,7 +58,7 @@ class SceneStageSelect extends Phaser.Scene {
     backTitle.style.backgroundColor = '#333333';
     backTitle.style.color = 'white';
     backTitle.innerHTML = 'タイトルへ<ruby>戻<rp>(</rp><rt>もど</rt><rp>)</rp></ruby>る';
-    stageDiv.appendChild(backTitle);
+    this.stageDiv.appendChild(backTitle);
 
     // コールバックの指定
     backTitle.addEventListener('click', function() {
