@@ -4,7 +4,7 @@
 // button(this.stage)をクリックすると、accordion(this.content)が出現。
 // その中にステージ開始ボタン(this.button)が含まれる
 export class SimpleButton {
-  constructor(parent, scene, x, y, classname, id, width, buttonColor, text, textColor, img) {
+  constructor(parent, scene, x, y, classname, id, width, buttonColor, text, textColor, img, message) {
     this.stage = document.createElement('div');
     this.stage.setAttribute('class', 'simple-button-div');
     this.stage.setAttribute('id', id);
@@ -32,6 +32,10 @@ export class SimpleButton {
     this.image = document.createElement('img');
     this.image.setAttribute('src', img);
     this.content.appendChild(this.image);
+
+    this.message = document.createElement('div');
+    this.message.innerHTML = message;
+    this.content.appendChild(this.message);
 
     this.buttonFrame = document.createElement('div');
     this.buttonFrame.setAttribute('class', 'title-box');

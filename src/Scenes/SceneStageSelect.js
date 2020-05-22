@@ -45,7 +45,7 @@ class SceneStageSelect extends Phaser.Scene {
     phaserDiv.appendChild(this.stageDiv);
 
     stageList.forEach((stage, i) => {
-      const stageButton = new SimpleButton(this.stageDiv, this, 0, 100 * i, 'stage_button', 'stageselect' + stage.id, this.width - 100, '#FFFF96', stage.title, 'white', '/stage/' + stage.id + '.png');
+      const stageButton = new SimpleButton(this.stageDiv, this, 0, 100 * i, 'stage_button', 'stageselect' + stage.id, this.width - 100, '#FFFF96', stage.title, 'white', '/stage/' + stage.id + '.png', stage.message);
       stageButton.button.addEventListener('click', function() {
         this.scene.start('load', {stage_dir: stage.id, idx: i});
       }.bind(this));
