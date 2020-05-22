@@ -17,6 +17,9 @@ const config = {
   height: 600,
   parent: 'phaserDiv',
   scene: [SceneTitle, SceneStageSelect, SceneLoad, SceneGame],
+  render: {
+    transparent: true,
+  },
 };
 
 // initialize(この辺のvar/constはクラスでどっかに飛ばしたい)

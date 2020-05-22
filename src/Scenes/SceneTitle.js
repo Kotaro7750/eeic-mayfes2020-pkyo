@@ -1,24 +1,27 @@
 import Phaser from 'phaser';
 import {FlipButton} from '../Objects/Objects';
+import TitleImg from './title.png';
 
 class SceneTitle extends Phaser.Scene {
   constructor() {
     super({key: 'title'});
   }
 
-  preload() { }
+  preload() {
+    this.load.image('title', TitleImg);
+  }
 
   create() {
     this.width = document.documentElement.clientWidth;
     this.height = document.documentElement.clientHeight;
     this.game.scale.setGameSize(this.width, this.height);
+    this.title = this.add.image(this.width / 2, this.height / 4, 'title');
+    console.log(this.title);
     window.onresize = () => {
       this.width = document.documentElement.clientWidth;
       this.height = document.documentElement.clientHeight;
       this.game.scale.setGameSize(this.width, this.height);
     };
-
-    this.add.text(200, 50, 'Apple', {fontSize: 50, color: 'red'});
 
     const phaserDiv = document.getElementById('phaserDiv');
     document.querySelectorAll('#phaserDiv div').forEach((v) => {

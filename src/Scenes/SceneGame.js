@@ -102,6 +102,7 @@ class SceneGame extends Phaser.Scene {
         .then((space) => {
           this.leftBlock = this.stageRunner.stageConfig.maxBlock;
           this.workspace = space;
+          console.log(this.workspace);
           this.workspace.addChangeListener(function(event) {
             console.log(event);
             if (event.type === Blockly.Events.BLOCK_CREATE) {
