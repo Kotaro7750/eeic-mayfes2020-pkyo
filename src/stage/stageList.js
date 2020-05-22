@@ -12,7 +12,7 @@ const stageList = [
   {
     id: 'if-turn',
     title: '<ruby>条件<rp>(</rp><rt>じょうけん</rt><rp>)</rp></ruby>で<ruby>分<rp>(</rp><rt>わ</rt><rp>)</rp></ruby>けてみよう！１',
-    message: '「<ruby>曲<rp>(</rp><rt>ま</rt><rp>)</rp></ruby>がってみよう！」を<ruby>条件分岐<rp>(</rp><rt>じょうけんぶんき</rt><rp>)</rp></ruby>でやってみよう！'
+    message: '「<ruby>曲<rp>(</rp><rt>ま</rt><rp>)</rp></ruby>がってみよう！」を<ruby>条件分岐<rp>(</rp><rt>じょうけんぶんき</rt><rp>)</rp></ruby>でやってみよう！',
   },
   {
     id: 'if-else',

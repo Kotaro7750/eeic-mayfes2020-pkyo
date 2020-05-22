@@ -58,13 +58,13 @@ export default {
     const codeIf = Blockly.JavaScript.statementToCode(block, 'IFCODE');
     const codeElse = Blockly.JavaScript.statementToCode(block, 'ELSECODE');
     return `{
+      this.cmdDelta = 35;
+      yield "${block.id.replace('"', '\\"')}";
       if(${cond}) {
         ${codeIf}
       } else {
         ${codeElse}
       }
-      this.cmdDelta = 35;
-      yield true;
     }`;
   },
   block_iswallfront: (block) => {
@@ -163,32 +163,29 @@ export default {
     funcs['${group}'] = function*() {
       ${code}
     }.bind(this);
-    this.cmdDelta = 35;
-    yield "${block.id.replace('"', '\\"')}";
+    this.cmdDelta = 1;
+    yield null;
     `;
   },
   block_functioncall: (block) => {
     const group = 'group-' + block.getFieldValue('GROUPID');
     return `{
       let tmp_gen = funcs['${group}']();
-      let cnt = 0;
+      this.cmdDelta = 35;
+      yield "${block.id.replace('"', '\\"')}";
       while(true) {
-        if (cnt++ === 10) {
-          break;
-        }
         let gen_res = tmp_gen.next();
+        console.log(gen_res);
         if(gen_res.done) {
           if(gen_res.value === 'failed') {
             return 'failed';
           }
+          break;
         }
         else {
           yield gen_res.value;
         }
       }
-      console.log('check-cnt', cnt);
-      this.cmdDelta = 35;
-      yield "${block.id.replace('"', '\\"')}";
     }`;
   },
 };
