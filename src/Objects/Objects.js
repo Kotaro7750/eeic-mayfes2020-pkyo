@@ -4,7 +4,7 @@
 // button(this.stage)をクリックすると、accordion(this.content)が出現。
 // その中にステージ開始ボタン(this.button)が含まれる
 export class SimpleButton {
-  constructor(parent, scene, x, y, classname, id, width, buttonColor, text, textColor) {
+  constructor(parent, scene, x, y, classname, id, width, buttonColor, text, textColor, img) {
     this.stage = document.createElement('div');
     this.stage.setAttribute('class', 'simple-button-div');
     this.stage.setAttribute('id', id);
@@ -25,10 +25,17 @@ export class SimpleButton {
     this.label.innerHTML = text;
     this.stage.appendChild(this.label);
 
+    this.content = document.createElement('div');
+    this.content.setAttribute('class', 'accordion-content');
+    this.stage.appendChild(this.content);
+
+    this.image = document.createElement('img');
+    this.image.setAttribute('src', img);
+    this.content.appendChild(this.image);
+
     this.button = document.createElement('div');
-    this.button.setAttribute('class', 'accordion-content');
     this.button.innerHTML = 'ゲームを<ruby>始<rp>(</rp><rt>はじ</rt><rp>)</rp></ruby>める';
-    this.stage.appendChild(this.button);
+    this.content.appendChild(this.button);
   }
 };
 

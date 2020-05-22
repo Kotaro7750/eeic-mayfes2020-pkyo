@@ -6,7 +6,9 @@ class SceneStageSelect extends Phaser.Scene {
   constructor() {
     super({key: 'stage-select'});
   }
-  preload() { }
+  preload() {
+  }
+
   create() {
     this.width = document.documentElement.clientWidth;
     this.height = document.documentElement.clientHeight;
@@ -41,7 +43,7 @@ class SceneStageSelect extends Phaser.Scene {
     phaserDiv.appendChild(stageDiv);
 
     stageList.forEach((stage, i) => {
-      const stageButton = new SimpleButton(stageDiv, this, 0, 100 * i, 'stage_button', 'stageselect' + stage.id, this.width - 100, 'red', stage.title, 'white');
+      const stageButton = new SimpleButton(stageDiv, this, 0, 100 * i, 'stage_button', 'stageselect' + stage.id, this.width - 100, 'red', stage.title, 'white', '/stage/' + stage.id + '.png');
       stageButton.button.addEventListener('click', function() {
         this.scene.start('load', {stage_dir: stage.id, idx: i});
       }.bind(this));
