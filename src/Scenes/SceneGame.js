@@ -4,7 +4,7 @@ import stageList from '../stage/stageList';
 
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import {FlipButton} from '../Objects/Objects.js';
+import {FlipFlexButton} from '../Objects/Objects.js';
 
 const enumExecModePre = 1;
 const enumExecModeRun = 2;
@@ -205,14 +205,37 @@ class SceneGame extends Phaser.Scene {
       // ゴール判定を満たすならばゴール処理
       // そうでなければ通常の処理
       if (this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY) {
+        console.log('clear!');
         const phaserDiv = document.getElementById('phaserDiv');
 
-        // TODO: ゲームクリアという表示を出す
-
-        const button = new FlipButton(phaserDiv, '次へ', 50, 500, 100, 50);
-        const buttonT = new FlipButton(phaserDiv, 'タイトルへ', 50, 550, 250, 50);
-        const buttonS = new FlipButton(phaserDiv, 'ステージ', 50, 450, 250, 50);
-
+        // modalもどきを実装します
+        const modal = document.createElement('div');
+        modal.setAttribute('class', 'modal-area modal-is-show');
+        phaserDiv.appendChild(modal);
+        const modalBg = document.createElement('div');
+        modalBg.setAttribute('class', 'modal-background');
+        modal.appendChild(modalBg);
+        const modalWrapper = document.createElement('div');
+        modalWrapper.setAttribute('class', 'modal-wrapper');
+        modal.appendChild(modalWrapper);
+        const modalCloser = document.createElement('i');
+        modalCloser.setAttribute('class', 'modal-closer fas fa-times');
+        // insert close button
+        modalWrapper.appendChild(modalCloser);
+        const modalContents = document.createElement('div');
+        modalContents.style.display = 'flex';
+        modalContents.style.flexDirection = 'column';
+        modalContents.innerHTML = 'これ見える?';
+        modalWrapper.appendChild(modalContents);
+        const modalButtons = document.createElement('div');
+        modalButtons.style.display = 'flex';
+        modalButtons.style.flexDirection = 'row';
+        modalContents.appendChild(modalButtons);
+        const button = new FlipFlexButton(modalButtons, '次へ', 50, 500, 100, 50);
+        const buttonT = new FlipFlexButton(modalButtons, 'タイトルへ', 50, 550, 250, 50);
+        const buttonS = new FlipFlexButton(modalButtons, 'ステージ', 50, 450, 250, 50);
+        modalBg.addEventListener('click', () => modal.classList.toggle('modal-is-show'));
+        modalCloser.addEventListener('click', () => modal.classList.toggle('modal-is-show'));
         button.button.addEventListener('click', function() {
           // TODO: ボタン押したら次のゲームが展開されるようにしたい
           this.exitScene();

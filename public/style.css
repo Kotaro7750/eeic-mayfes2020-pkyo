@@ -118,6 +118,8 @@ h1 {
 
 /* title button */
 .title-box {
+	flex: auto;
+	margin: 0px 10px;
 	background-color: #00E1FF;
 	width: auto;
 	height: auto;
@@ -223,4 +225,46 @@ h1 {
 	border-style: solid;
 	border-color: #ffdb88 #fff #ffdb88;
 	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+/* modal */
+.modal-area {
+	visibility: hidden;
+	opacity: 0;
+	position: fixed;
+	z-index: 10;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	transition: 0.5s;
+}
+
+.modal-background {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(30, 30, 30, 0.9);
+}
+
+.modal-wrapper {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 70%;
+	max-width: 720px;
+	padding: 10px 30px;
+	background-color: #FFFFFF;
+}
+
+.modal-closer {
+	position: absolute;
+	top: 0.5rem;
+	right: 1rem;
+	cursor: pointer;
+}
+
+.modal-is-show {
+	visibility: visible;
+	opacity: 1;
 }

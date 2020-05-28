@@ -67,3 +67,17 @@ export class FlipButton {
     parent.appendChild(this.div);
   }
 };
+
+export class FlipFlexButton {
+  constructor(parent, text) {
+    this.div = document.createElement('div');
+    this.div.setAttribute('class', 'title-box');
+    this.button = document.createElement('div');
+    this.button.setAttribute('class', 'title-button');
+    this.content = document.createElement('div');
+    this.content.innerHTML = text;
+    this.button.appendChild(this.content);
+    this.div.appendChild(this.button);
+    parent.appendChild(this.div);
+  }
+};
