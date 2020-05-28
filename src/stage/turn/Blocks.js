@@ -43,6 +43,7 @@ export default {
         case 'down':
           this.player.dir = '${turnDirection === '1' ? 'right' : 'left'}';
       }
+      this.setDir();
       this.cmdDelta = 35;
       yield "${block.id.replace('"', '\\"')}";
     }

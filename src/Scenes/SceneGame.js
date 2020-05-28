@@ -49,7 +49,6 @@ class SceneGame extends Phaser.Scene {
   }
 
   async create() {
-    console.log('create ' + this.stageDir);
     const awaitedResources = await this.stageRunner.load();
 
     this.stageRunner.xmlFilePath = awaitedResources[0];
@@ -102,9 +101,7 @@ class SceneGame extends Phaser.Scene {
         .then((space) => {
           this.leftBlock = this.stageRunner.stageConfig.maxBlock;
           this.workspace = space;
-          console.log(this.workspace);
           this.workspace.addChangeListener(function(event) {
-            console.log(event);
             if (event.type === Blockly.Events.BLOCK_CREATE) {
               this.leftBlock -= 1;
             } else if (event.type === Blockly.Events.BLOCK_DELETE) {
@@ -133,35 +130,58 @@ class SceneGame extends Phaser.Scene {
     this.initGameField();
     // ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)
     // これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
-    this.player.sprite.scene.anims.create({
+    console.log(this.player.sprite, this.player.sprite.anims);
+    this.anims.create({
       key: 'right',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [5, 6, 7]}),
+      frames: [
+        {key: 'player', frame: 6},
+        {key: 'player', frame: 7},
+        {key: 'player', frame: 8},
+        {key: 'player', frame: 7},
+      ],
       frameRate: 7,
       repeat: -1,
     });
-    this.player.sprite.scene.anims.create({
+    this.anims.create({
       key: 'left',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [3, 4, 5]}),
+      frames: [
+        {key: 'player', frame: 3},
+        {key: 'player', frame: 4},
+        {key: 'player', frame: 5},
+        {key: 'player', frame: 4},
+      ],
       frameRate: 7,
       repeat: -1,
     });
-    this.player.sprite.scene.anims.create({
+    this.anims.create({
       key: 'up',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [9, 10, 11]}),
+      frames: [
+        {key: 'player', frame: 9},
+        {key: 'player', frame: 10},
+        {key: 'player', frame: 11},
+        {key: 'player', frame: 10},
+      ],
       frameRate: 7,
       repeat: -1,
     });
-    this.player.sprite.scene.anims.create({
+    this.anims.create({
       key: 'down',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [0, 1, 2]}),
+      frames: [
+        {key: 'player', frame: 0},
+        {key: 'player', frame: 1},
+        {key: 'player', frame: 2},
+        {key: 'player', frame: 1},
+      ],
       frameRate: 7,
       repeat: -1,
     });
-    this.setDir();
   }
 
   update() {
-    if (this.execMode === enumExecModeRun) this.updateOnRunning();
+    if (this.execMode === enumExecModeRun) {
+      console.log(this.player.sprite.anims.currentAnim, this.player.sprite.anims.currentFrame, this.player.sprite.frame);
+      this.updateOnRunning();
+    }
   }
 
   setDir() {
@@ -186,16 +206,22 @@ class SceneGame extends Phaser.Scene {
   // 実行中の処理を行うパート
   updateOnRunning() {
     // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
-    this.setDir();
+    // this.setDir();
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      this.player.sprite.anims.play(this.player.dir, true);
+      if (!this.player.sprite.anims.currentAnim || this.player.sprite.anims.currentAnim.key !== this.player.dir) {
+        console.log('start', this.player.dir);
+        this.player.sprite.anims.play(this.player.dir, true);
+      }
       this.player.sprite.x += difX / Math.abs(difX) * 1;
     }
     if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
-      this.player.sprite.anims.play(this.player.dir, true);
+      if (!this.player.sprite.anims.currentAnim || this.player.sprite.anims.currentAnim.key !== this.player.dir) {
+        console.log('start', this.player.dir);
+        this.player.sprite.anims.play(this.player.dir, true);
+      }
       this.player.sprite.y += difY / Math.abs(difY) * 1;
     }
     if (++this.tick === this.cmdDelta) {
@@ -205,7 +231,6 @@ class SceneGame extends Phaser.Scene {
       // ゴール判定を満たすならばゴール処理
       // そうでなければ通常の処理
       if (this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY) {
-        console.log('clear!');
         const phaserDiv = document.getElementById('phaserDiv');
 
         // modalもどきを実装します
@@ -257,7 +282,6 @@ class SceneGame extends Phaser.Scene {
         this.execMode = enumExecModeClear;
       } else {
         const gen = this.commandGenerator.next();
-        console.log(gen.value);
         this.workspace.highlightBlock(gen.value);
         if (gen.done) {
           this.execMode = enumExecModeDone;
@@ -271,7 +295,6 @@ class SceneGame extends Phaser.Scene {
   }
 
   startBlockly() {
-    console.log('start blockly');
     if (this.execMode === enumExecModePre) {
       this.execMode = enumExecModeRun;
 
@@ -287,7 +310,6 @@ class SceneGame extends Phaser.Scene {
       code = '(function* () {' + code + '})';
 
       try {
-        console.log('code: ', code);
         this.commandGenerator = eval(code).bind(this)();
       } catch (err) {
         console.log(err);
@@ -452,7 +474,9 @@ class SceneGame extends Phaser.Scene {
   }
   tryMove(player, dir) {
     this.changeDir(player, ['right', 'left', 'up', 'down'][dir]);
-    if (dir < 0 || dir >= 4) console.log('incorrect dir in tryMove()');
+    if (dir < 0 || dir >= 4) {
+      return;
+    }
 
     const dx = [1, -1, 0, 0];
     const dy = [0, 0, -1, 1];
