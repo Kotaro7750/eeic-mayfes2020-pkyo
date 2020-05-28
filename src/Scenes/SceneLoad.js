@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import StageRunner from '../StageRunner';
-import playerImg from './erena.png';
+import playerImg from './elena.png';
 
 class SceneLoad extends Phaser.Scene {
   constructor() {

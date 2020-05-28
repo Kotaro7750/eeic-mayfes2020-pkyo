@@ -16,6 +16,13 @@ const config = {
   width: 400,
   height: 600,
   parent: 'phaserDiv',
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: {x: 0, y: 0},
+      debug: false,
+    },
+  },
   scene: [SceneTitle, SceneStageSelect, SceneLoad, SceneGame],
   render: {
     transparent: true,
