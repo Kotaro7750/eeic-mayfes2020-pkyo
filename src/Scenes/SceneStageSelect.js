@@ -49,7 +49,7 @@ class SceneStageSelect extends Phaser.Scene {
     const titleHeight = 109 * rate;
     this.stageTitle.style.width = this.width / 2 + 'px';
     this.stageTitle.style.height = titleHeight + 'px';
-    phaserDiv.appendChild(this.stageTitle);
+    this.background.appendChild(this.stageTitle);
 
     this.stageDiv = document.createElement('div');
     this.stageDiv.style.position = 'absolute';
