@@ -20,8 +20,6 @@ class SceneStageSelect extends Phaser.Scene {
       this.stageDiv.style.height = (this.height - 200) + 'px';
     };
 
-    this.add.text(200, 50, 'Very Very Cool\nStage Select', {fontSize: 50, color: 'white'});
-
     // 全体統一のdiv
     const phaserDiv = document.getElementById('phaserDiv');
 
@@ -32,14 +30,35 @@ class SceneStageSelect extends Phaser.Scene {
       }
     });
 
+    this.background = document.createElement('div');
+    this.background.style.zIndex = -1;
+    this.background.style.position = 'fixed';
+    this.background.style.width = '100%';
+    this.background.style.height = '100%';
+    this.background.style.top = '0px';
+    this.background.style.left = '0px';
+    this.background.style.backgroundColor = '#ffff96';
+    phaserDiv.appendChild(this.background);
+
+    this.stageTitle = document.createElement('img');
+    this.stageTitle.setAttribute('src', window.location.pathname.replace(new RegExp('\\\/[^\\\/]*$'), '') + '/stage/stage-select.png');
+    this.stageTitle.style.position = 'absolute';
+    this.stageTitle.style.left = this.width / 4 + 'px';
+    this.stageTitle.style.top = '0px';
+    const rate = (this.width / 2) / 770;
+    const titleHeight = 109 * rate;
+    this.stageTitle.style.width = this.width / 2 + 'px';
+    this.stageTitle.style.height = titleHeight + 'px';
+    phaserDiv.appendChild(this.stageTitle);
+
     this.stageDiv = document.createElement('div');
     this.stageDiv.style.position = 'absolute';
     this.stageDiv.style.overflowY = 'scroll';
     this.stageDiv.style.width = 'auto';
-    this.stageDiv.style.height = (this.height - 200) + 'px';
+    this.stageDiv.style.height = (this.height - titleHeight - 20) + 'px';
     this.stageDiv.overflowY = 'scroll';
     this.stageDiv.style.left = '0px';
-    this.stageDiv.style.top = '200px';
+    this.stageDiv.style.top = (titleHeight + 20) + 'px';
     this.stageDiv.style.paddingLeft = '50px';
     this.stageDiv.style.paddingRight = '50px';
     phaserDiv.appendChild(this.stageDiv);
