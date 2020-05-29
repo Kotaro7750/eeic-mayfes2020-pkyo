@@ -30,7 +30,7 @@ export class SimpleButton {
     this.stage.appendChild(this.content);
 
     this.image = document.createElement('img');
-    this.image.setAttribute('src', img);
+    this.image.setAttribute('src', window.location.pathname.replace(new RegExp('\\\/[^\\\/]*$'), '') + img);
     this.content.appendChild(this.image);
 
     this.message = document.createElement('div');
