@@ -25,8 +25,8 @@ class BlocklyRunner {
     Blockly.defineBlocksWithJsonArray([
       init,
     ]);
-    Blockly.JavaScript[name] = (name) => {
-      return conv(name);
+    Blockly.JavaScript[name] = (v) => {
+      return conv(v);
     };
   }
 
@@ -37,7 +37,7 @@ class BlocklyRunner {
     });
   }
 
-  async renderBlockly(startBlockly, pauseBlockly, maxBlocks) {
+  async renderBlockly(maxBlocks) {
     console.log(this.xmlFilePath);
     const xmlFile = await this.getFile(this.xmlFilePath);
     console.log(xmlFile);
@@ -67,13 +67,12 @@ class BlocklyRunner {
     };
 
     this.workspace = Blockly.inject('blocklyDiv', options);
-    console.log(this.workspace);
     Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'), this.workspace);
 
-    const executeButton = document.getElementById('executeButton');
-    executeButton.onclick = startBlockly;
-    const pauseButton = document.getElementById('pauseButton');
-    pauseButton.onclick = pauseBlockly;
+    this.workspace.getTopBlocks().forEach((block) => {
+      block.setMovable(false);
+      this.rootBlockId = block.id;
+    });
     return this.workspace;
   }
 

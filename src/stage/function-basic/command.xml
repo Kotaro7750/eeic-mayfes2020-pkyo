@@ -1,0 +1,12 @@
+ <xml>
+    <block type="loop"></block>
+    <block type="move"></block>
+    <block type="turn"></block>
+    <block type="jumphole"></block>
+    <block type="ifelse"></block>
+    <block type="iswallfront"></block>
+    <block type="iswallright"></block>
+    <block type="fronthole"></block>
+    <block type="function"></block>
+    <block type="functioncall"></block>
+</xml>

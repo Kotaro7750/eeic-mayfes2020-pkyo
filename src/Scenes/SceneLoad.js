@@ -1,17 +1,19 @@
 import Phaser from 'phaser';
 import StageRunner from '../StageRunner';
-import playerImg from '../../public/stage/ex1.png';
+import playerImg from './elena.png';
 
 class SceneLoad extends Phaser.Scene {
   constructor() {
     super({key: 'load'});
 
     this.stageDir;
+    this.idx;
     this.stageRunner;
   }
 
   init(data) {
     this.stageDir = data.stage_dir;
+    this.idx = data.idx;
   }
 
   async preload() {
@@ -21,7 +23,7 @@ class SceneLoad extends Phaser.Scene {
 
     // player
     // TODO playerImgだけは動的importしてない
-    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 48});
+    this.load.spritesheet('player', playerImg, {frameWidth: 32, frameHeight: 32});
 
     const awaitedResources = await this.stageRunner.preload();
     this.load.tilemapTiledJSON('map-' + this.stageDir, awaitedResources[0]);
@@ -29,10 +31,10 @@ class SceneLoad extends Phaser.Scene {
     this.load.start();
 
     if (this.cache.tilemap.exists('map-' + this.stageDir) && this.load.textureManager.exists('tiles-' + this.stageDir) && this.load.textureManager.exists('player')) {
-      this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner});
+      this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner, idx: this.idx});
     } else {
       this.load.on('complete', () => {
-        this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner});
+        this.scene.start('game', {stage_dir: this.stageDir, stageRunner: this.stageRunner, idx: this.idx});
       });
     }
   }

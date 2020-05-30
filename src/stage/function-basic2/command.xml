@@ -1,0 +1,8 @@
+ <xml>
+    <block type="loop"></block>
+    <block type="move"></block>
+    <block type="turn"></block>
+    <block type="jumphole"></block>
+    <block type="function"></block>
+    <block type="functioncall"></block>
+</xml>

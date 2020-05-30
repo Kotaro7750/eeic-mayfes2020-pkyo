@@ -1,9 +1,10 @@
 import Blockly from 'blockly';
 import Phaser from 'phaser';
+import stageList from '../stage/stageList';
 
 import BlocklyRunner from '../Blockly/BlocklyRunner.js';
 
-import SimpleButton from '../Objects/Objects.js';
+import {FlipFlexButton} from '../Objects/Objects.js';
 
 const enumExecModePre = 1;
 const enumExecModeRun = 2;
@@ -16,6 +17,7 @@ class SceneGame extends Phaser.Scene {
   init(data) {
     this.stageDir = data.stage_dir;
     this.stageRunner = data.stageRunner;
+    this.idx = data.idx;
   }
   constructor() {
     super({key: 'game'});
@@ -47,7 +49,6 @@ class SceneGame extends Phaser.Scene {
   }
 
   async create() {
-    console.log('create ' + this.stageDir);
     const awaitedResources = await this.stageRunner.load();
 
     this.stageRunner.xmlFilePath = awaitedResources[0];
@@ -59,37 +60,64 @@ class SceneGame extends Phaser.Scene {
     this.stageRunner.blockDefs = awaitedResources[2];
     this.stageRunner.blockFuncs = awaitedResources[3];
 
-    this.game.scale.setGameSize(400, 600);
-    // htmlボタンを可視化する
-    this.displayCircleButton();
+    this.width = document.documentElement.clientWidth;
+    this.height = document.documentElement.clientHeight;
+    this.game.scale.setGameSize(this.width / 2, this.height);
 
-    const resetButton = document.getElementById('resetButton');
-    resetButton.onclick = this.initGameField.bind(this);
-    const backButton = document.getElementById('backButton');
-    backButton.onclick = this.backToStageSelect.bind(this);
+    // blocklyのdiv.style.leftを予め調整しておく
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    blocklyDiv.style.left = this.width / 2 + 'px';
+    blocklyDiv.style.top = '0px';
+    blocklyDiv.style.width = this.width / 2 + 'px';
+    blocklyDiv.style.height = this.height;
+
+    window.onresize = function() {
+      this.width = document.documentElement.clientWidth;
+      this.height = document.documentElement.clientHeight;
+      this.map2Img = Math.min(this.height / this.backgroundLayer.height, this.width, this.backgroundLayer.width);
+      this.width = this.backgroundLayer.width * this.map2Img;
+      this.height = this.backgroundLayer.height * this.map2Img;
+      this.game.scale.setGameSize(this.width, this.height);
+      this.player.sprite.setScale(this.map2Img / 1.7);
+
+      this.backgroundLayer.setScale(this.map2Img);
+      this.initGameField();
+
+      blocklyDiv.style.left = this.width + 'px';
+      blocklyDiv.style.top = '0px';
+      blocklyDiv.style.width = (document.documentElement.clientWidth - this.width) + 'px';
+      blocklyDiv.style.height = this.height + 'px';
+      Blockly.svgResize(this.workspace);
+    }.bind(this);
+
     // stage固有ブロックの定義
     this.stageRunner.blockDefs.forEach((elem) => {
       this.blocklyRunner.setBlockDefinition(elem.name, elem.block, this.stageRunner.blockFuncs.default['block_' + elem.name]);
     });
 
-    // blocklyのdiv.style.leftを予め調整しておく
-    const blocklyDiv = document.getElementById('blocklyDiv');
-    blocklyDiv.style.left = this.game.canvas.width;
-
     // blocklyの描画設定(レンダリング)
     // コールバック関数を渡す時はちゃんとbindする
-    this.blocklyRunner.renderBlockly(this.startBlockly.bind(this), this.pauseBlockly.bind(this))
+    this.blocklyRunner.renderBlockly(this.stageRunner.stageConfig.maxBlock)
         .then((space) => {
+          this.leftBlock = this.stageRunner.stageConfig.maxBlock;
           this.workspace = space;
+          this.workspace.addChangeListener(function(event) {
+            if (event.type === Blockly.Events.BLOCK_CREATE) {
+              this.leftBlock -= 1;
+            } else if (event.type === Blockly.Events.BLOCK_DELETE) {
+              this.leftBlock += event.ids.length;
+            }
+            const numFrame = document.getElementById('numFrame');
+            numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.leftBlock}`;
+          }.bind(this));
+          window.onresize(); // ここでinitgamefieldを呼んでしまっているのよくない
         });
-
 
     // mapの表示(mapはcanvasのwidth,heightと同じ比で作成されていることが前提です)
     this.mapDat = this.add.tilemap('map-' + this.stageDir);
     const tileset = this.mapDat.addTilesetImage('tileset', 'tiles-' + this.stageDir);
     this.backgroundLayer = this.mapDat.createDynamicLayer('ground', tileset);
-    this.map2Img = this.game.canvas.width / this.backgroundLayer.width;
-    console.log(this.map2Img);
+    this.map2Img = this.game.canvas.height / this.backgroundLayer.height;
     this.backgroundLayer.setScale(this.map2Img);
     this.mapDat = {...this.mapDat, ...this.stageRunner.stageConfig};
 
@@ -97,63 +125,104 @@ class SceneGame extends Phaser.Scene {
     // 実はthis.mapDat.tilesets[0].texCoordinatesに各tileの座標が記録されています(が今回使っていない)
     this.player.sprite = this.add.sprite(0, 0, 'player');
     this.player.sprite.setOrigin(0, 1);
+    this.player.sprite.setScale(this.map2Img / 1.5);
     // プレイヤーの位置等の初期化処理をしている
     this.initGameField();
     // ここでアニメーションの定義(193,194行目のようにthis.player.sprite.anims.play('key', true);でこのアニメーションを実行できる)
     // これをplayerクラスに上下左右入れれば4方向へのアニメーションができそう
-    this.player.sprite.scene.anims.create({
+    console.log(this.player.sprite, this.player.sprite.anims);
+    this.anims.create({
       key: 'right',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [5, 6, 7, 8]}),
+      frames: [
+        {key: 'player', frame: 6},
+        {key: 'player', frame: 7},
+        {key: 'player', frame: 8},
+        {key: 'player', frame: 7},
+      ],
       frameRate: 7,
       repeat: -1,
     });
-    this.player.sprite.scene.anims.create({
+    this.anims.create({
       key: 'left',
-      frames: this.player.sprite.scene.anims.generateFrameNumbers('player', {frames: [0, 1, 2, 3]}),
+      frames: [
+        {key: 'player', frame: 3},
+        {key: 'player', frame: 4},
+        {key: 'player', frame: 5},
+        {key: 'player', frame: 4},
+      ],
       frameRate: 7,
       repeat: -1,
     });
-    this.setDir();
+    this.anims.create({
+      key: 'up',
+      frames: [
+        {key: 'player', frame: 9},
+        {key: 'player', frame: 10},
+        {key: 'player', frame: 11},
+        {key: 'player', frame: 10},
+      ],
+      frameRate: 7,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: 'down',
+      frames: [
+        {key: 'player', frame: 0},
+        {key: 'player', frame: 1},
+        {key: 'player', frame: 2},
+        {key: 'player', frame: 1},
+      ],
+      frameRate: 7,
+      repeat: -1,
+    });
   }
 
   update() {
-    if (this.execMode === enumExecModeRun) this.updateOnRunning();
+    if (this.execMode === enumExecModeRun) {
+      console.log(this.player.sprite.anims.currentAnim, this.player.sprite.anims.currentFrame, this.player.sprite.frame);
+      this.updateOnRunning();
+    }
   }
 
   setDir() {
     switch (this.player.dir) {
       case 'down':
-        this.player.sprite.setFrame(4);
+        this.player.sprite.setFrame(0);
         break;
       case 'up':
         this.player.sprite.setFrame(9);
         break;
       case 'right':
-        this.player.sprite.setFrame(5);
+        this.player.sprite.setFrame(6);
         break;
       case 'left':
-        this.player.sprite.setFrame(0);
+        this.player.sprite.setFrame(3);
         break;
       default:
-        console.error('incorrect dir in setDir()');
+        console.log('incorrect dir in setDir()');
     }
   };
 
   // 実行中の処理を行うパート
   updateOnRunning() {
-    console.log(this.player.dir);
     // これはobjectリストなるものをここに用意しておいて、適宜push/popすることでまとめて管理も可能
+    // this.setDir();
     if (this.player.targetX !== this.player.sprite.x) {
       const difX = this.player.targetX - this.player.sprite.x;
       // とてもよくない(画像サイズ規定を設けるor微分方程式なので減衰覚悟でやる)
-      this.player.sprite.anims.play(this.player.dir, true);
+      if (!this.player.sprite.anims.currentAnim || this.player.sprite.anims.currentAnim.key !== this.player.dir) {
+        console.log('start', this.player.dir);
+        this.player.sprite.anims.play(this.player.dir, true);
+      }
       this.player.sprite.x += difX / Math.abs(difX) * 1;
-    } else if (this.player.targetY !== this.player.sprite.y) {
+    }
+    if (this.player.targetY !== this.player.sprite.y) {
       const difY = this.player.targetY - this.player.sprite.y;
-      this.setDir();
+      if (!this.player.sprite.anims.currentAnim || this.player.sprite.anims.currentAnim.key !== this.player.dir) {
+        console.log('start', this.player.dir);
+        this.player.sprite.anims.play(this.player.dir, true);
+      }
       this.player.sprite.y += difY / Math.abs(difY) * 1;
-    } else {
-      this.setDir();
     }
     if (++this.tick === this.cmdDelta) {
       this.tick = 0;
@@ -162,21 +231,53 @@ class SceneGame extends Phaser.Scene {
       // ゴール判定を満たすならばゴール処理
       // そうでなければ通常の処理
       if (this.goal.gridX === this.player.gridX && this.goal.gridY === this.player.gridY) {
-        const button = new SimpleButton(this, 50, 500, 100, 50, 0x7fff7f, '次へ', 'green');
-        const buttonT = new SimpleButton(this, 50, 550, 250, 50, 0xff7f7f, 'タイトルへ', 'red');
-        const buttonS = new SimpleButton(this, 50, 450, 250, 50, 0x7f7fff, 'ステージ', 'blue');
-        // eslint-disable-next-line no-unused-vars
-        const button2 = new SimpleButton(this, 50, 200, 300, 50, 0xfffff00, 'Game Clear', 'green');
-        button.button.on('pointerdown', function() {
-          // ボタン押したら次のゲームが展開されるようにしたい
+        const phaserDiv = document.getElementById('phaserDiv');
+
+        // modalもどきを実装します
+        const modal = document.createElement('div');
+        modal.setAttribute('class', 'modal-area modal-is-show');
+        phaserDiv.appendChild(modal);
+        const modalBg = document.createElement('div');
+        modalBg.setAttribute('class', 'modal-background');
+        modal.appendChild(modalBg);
+        const modalWrapper = document.createElement('div');
+        modalWrapper.setAttribute('class', 'modal-wrapper');
+        modal.appendChild(modalWrapper);
+        const modalCloser = document.createElement('i');
+        modalCloser.setAttribute('class', 'modal-closer fas fa-times');
+        // insert close button
+        modalWrapper.appendChild(modalCloser);
+        const modalContents = document.createElement('div');
+        modalContents.style.display = 'flex';
+        modalContents.style.flexDirection = 'column';
+        modalWrapper.appendChild(modalContents);
+        const congratuImage = document.createElement('img');
+        congratuImage.style.display = 'flex';
+        congratuImage.setAttribute('src', window.location.pathname.replace(new RegExp('\\\/[^\\\/]*$'), '') + '/stage/congratulations.png');
+        modalContents.appendChild(congratuImage);
+        const modalButtons = document.createElement('div');
+        modalButtons.style.display = 'flex';
+        modalButtons.style.flexDirection = 'row';
+        modalContents.appendChild(modalButtons);
+        const button = new FlipFlexButton(modalButtons, '次へ', 50, 500, 100, 50);
+        const buttonT = new FlipFlexButton(modalButtons, 'タイトルへ', 50, 550, 250, 50);
+        const buttonS = new FlipFlexButton(modalButtons, 'ステージ', 50, 450, 250, 50);
+        modalBg.addEventListener('click', () => modal.classList.toggle('modal-is-show'));
+        modalCloser.addEventListener('click', () => modal.classList.toggle('modal-is-show'));
+        button.button.addEventListener('click', function() {
+          // TODO: ボタン押したら次のゲームが展開されるようにしたい
           this.exitScene();
-          this.scene.start('次のゲーム');
+          if (stageList.length == this.idx + 1) {
+            this.scene.start('stage-select');
+          } else {
+            this.scene.start('load', {stage_dir: stageList[this.idx + 1].id, idx: this.idx + 1});
+          }
         }.bind(this));
-        buttonS.button.on('pointerdown', function() {
+        buttonS.button.addEventListener('click', function() {
           this.exitScene();
           this.scene.start('stage-select');
         }.bind(this));
-        buttonT.button.on('pointerdown', function() {
+        buttonT.button.addEventListener('click', function() {
           this.exitScene();
           this.scene.start('title');
         }.bind(this));
@@ -184,7 +285,6 @@ class SceneGame extends Phaser.Scene {
         this.execMode = enumExecModeClear;
       } else {
         const gen = this.commandGenerator.next();
-        console.log(gen.value);
         this.workspace.highlightBlock(gen.value);
         if (gen.done) {
           this.execMode = enumExecModeDone;
@@ -193,68 +293,68 @@ class SceneGame extends Phaser.Scene {
       }
     }
     if (this.tick > this.cmdDelta) {
-      console.error('Scene Game: tick exceeded cmdDelta');
+      console.log('Scene Game: tick exceeded cmdDelta');
     }
   }
 
   startBlockly() {
-    console.log('start blockly');
     if (this.execMode === enumExecModePre) {
       this.execMode = enumExecModeRun;
 
-      console.log(this.workspace);
+      // メインループ以外のルートブロックの削除
+      this.workspace.getTopBlocks().forEach(function(block) {
+        if (block.id !== this.blocklyRunner.rootBlockId) {
+          block.dispose(false);
+        }
+      }.bind(this));
       let code = Blockly.JavaScript.workspaceToCode(this.workspace);
 
       // ジェネレータに変換
       code = '(function* () {' + code + '})';
+      console.log(code);
 
       try {
-        console.log('code: ', code);
         this.commandGenerator = eval(code).bind(this)();
       } catch (err) {
-        console.error(err);
+        console.log(err);
       }
 
       this.blocklyRunner.updateBlockly();
+      this.redrawPauseButton();
       return this.commandGenerator;
-    } else {
-      return null;
-    }
-  };
-
-  pauseBlockly() {
-    // ポーズした時の処理を入れる
-    console.log('pause blockly');
-    if (this.execMode === enumExecModeRun) {
+    } else if (this.execMode == enumExecModeRun) {
       this.execMode = enumExecModePause;
-      this.player.sprite.anims.stop(); // anims.stopでアニメーション停止
+      this.player.sprite.anims.stop();
     } else if (this.execMode === enumExecModePause) {
       this.execMode = enumExecModeRun;
     }
     this.redrawPauseButton();
+    return null;
   };
 
-  displayCircleButton() {
-    const buttons = document.getElementsByClassName('circle_button');
-    for (const button of buttons) {
-      button.style.visibility = 'visible';
-    }
-  }
   redrawPauseButton() {
-    const element = document.getElementById('pauseButton');
-    if (this.execMode === enumExecModePause) {
-      element.innerHTML = 'restart';
+    const element = document.getElementById('executeButton');
+    if (this.execMode === enumExecModePause || this.execMode === enumExecModePre) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      const playIcon = document.createElement('i');
+      playIcon.setAttribute('class', 'fas fa-play-circle');
+      element.appendChild(playIcon);
     } else {
-      element.innerHTML = 'pause';
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      const pauseIcon = document.createElement('i');
+      pauseIcon.setAttribute('class', 'fas fa-pause-circle');
+      element.appendChild(pauseIcon);
     }
   };
 
   // playerの位置を初期位置に戻す
   // TODO: ここ冗長そう（constructorと同様の処理を書くのはアです）←まとめました
   initGameField() {
-    console.log('initGameField');
     this.player.sprite.anims.stop();// 同じくresetボタン押したらアニメーションを停止し、
-
 
     const playerX = this.stageRunner.stageConfig.playerX;
     const playerY = this.stageRunner.stageConfig.playerY;
@@ -276,10 +376,89 @@ class SceneGame extends Phaser.Scene {
 
     this.execMode = enumExecModePre;
 
-    this.redrawPauseButton();
     this.commandGenerator = null;
     this.cmdDelta = 1;
     this.tick = 0;
+
+    // ゲームクリアを考慮し、phaserDiv内の整理
+    this.phaserDiv = document.getElementById('phaserDiv');
+    document.querySelectorAll('#phaserDiv div').forEach((v) => {
+      if (this.phaserDiv.contains(v)) {
+        this.phaserDiv.removeChild(v);
+      }
+    });
+    const messageFrame = document.createElement('div');
+    messageFrame.style.position = 'absolute';
+    messageFrame.style.left = '5px';
+    messageFrame.style.top = (this.height - 150) + 'px';
+    messageFrame.style.width = (this.width - 10) + 'px';
+    messageFrame.style.height = '140px';
+    const messageDiv = document.createElement('div');
+    messageDiv.setAttribute('class', 'message-box');
+    const messageText = document.createElement('div');
+    messageText.setAttribute('class', 'message-box-text');
+    messageText.innerHTML = stageList[this.idx].message;
+    messageDiv.appendChild(messageText);
+    messageFrame.appendChild(messageDiv);
+    phaserDiv.appendChild(messageFrame);
+
+    const executeFrame = document.createElement('div');
+    executeFrame.style.position = 'absolute';
+    executeFrame.style.left = '10px';
+    executeFrame.style.top = '90px';
+    const executeButton = document.createElement('div');
+    executeButton.setAttribute('id', 'executeButton');
+    executeButton.setAttribute('class', 'circle_button');
+    const executeIcon = document.createElement('i');
+    executeIcon.setAttribute('class', 'fas fa-play-circle');
+    executeButton.appendChild(executeIcon);
+    executeFrame.appendChild(executeButton);
+    messageFrame.appendChild(executeFrame);
+    executeButton.onclick = this.startBlockly.bind(this);
+
+    const resetFrame = document.createElement('div');
+    resetFrame.style.position = 'absolute';
+    resetFrame.style.left = '70px';
+    resetFrame.style.top = '90px';
+    const resetButton = document.createElement('div');
+    resetButton.setAttribute('id', 'resetButton');
+    resetButton.setAttribute('class', 'circle_button');
+    const resetIcon = document.createElement('i');
+    resetIcon.setAttribute('class', 'fas fa-stop-circle');
+    resetButton.appendChild(resetIcon);
+    resetFrame.appendChild(resetButton);
+    messageFrame.appendChild(resetFrame);
+    resetButton.onclick = this.initGameField.bind(this);
+
+    const backFrame = document.createElement('div');
+    backFrame.style.position = 'absolute';
+    backFrame.style.left = (this.width - 70) + 'px';
+    backFrame.style.top = '90px';
+    const backButton = document.createElement('div');
+    backButton.setAttribute('id', 'backButton');
+    backButton.setAttribute('class', 'circle_button');
+    backButton.innerHTML = 'back';
+    backFrame.appendChild(backButton);
+    messageFrame.appendChild(backFrame);
+    backButton.onclick = this.backToStageSelect.bind(this);
+
+    const blocklyFlyout = document.querySelectorAll('.blocklyFlyout');
+    const numFrame = document.createElement('div');
+    numFrame.setAttribute('id', 'numFrame');
+    numFrame.setAttribute('class', 'numFrame');
+    numFrame.style.position = 'absolute';
+    numFrame.style.left = (this.width) + 'px';
+    numFrame.style.top = (this.height - 50) + 'px';
+    numFrame.style.textAlign = 'center';
+    numFrame.style.lineHeight = '50px';
+    numFrame.style.width = (blocklyFlyout.length > 1 ? blocklyFlyout[1].width.baseVal.valueAsString + 'px' : '200px');
+    numFrame.style.height = '50px';
+    numFrame.style.backgroundColor = '#e4e4e4';
+    numFrame.style.zIndex = 1;
+    numFrame.innerHTML = `<ruby>残<rp>(</rp><rt>のこ</rt><rp>)</rp></ruby>りブロック<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby>: ${this.leftBlock}`;
+    phaserDiv.appendChild(numFrame);
+
+    this.redrawPauseButton();
   };
 
   backToStageSelect() {
@@ -290,11 +469,6 @@ class SceneGame extends Phaser.Scene {
   exitScene() {
     this.workspace.dispose();
     this.workspace = null;
-    const buttons = document.getElementsByClassName('circle_button');
-    for (const button of buttons) {
-      button.style.visibility = 'hidden';
-      button.onclick = null;
-    }
   };
 
 
@@ -304,7 +478,9 @@ class SceneGame extends Phaser.Scene {
   }
   tryMove(player, dir) {
     this.changeDir(player, ['right', 'left', 'up', 'down'][dir]);
-    if (dir < 0 || dir >= 4) console.error('incorrect dir in tryMove()');
+    if (dir < 0 || dir >= 4) {
+      return;
+    }
 
     const dx = [1, -1, 0, 0];
     const dy = [0, 0, -1, 1];

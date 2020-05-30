@@ -21,23 +21,21 @@ h1 {
 
 #phaserDiv {
   position: absolute;
-  left: 10px;
-  top: 10px;
+  left: 0px;
+  top: 0px;
 }
 
 #blocklyDiv {
   position: absolute;
-  left: 410px;
-  top: 10px;
-  width: 480px;
+  left: 400px;
+  top: 0px;
+  width: 400px;
   height: 600px;
   z-index: 0;
 }
 
 #resetButton{
 	position: absolute;
-	left: 340px;
-	top: 30px;
 	z-index:1;
 	background: rgb(235, 12, 12);
 }
@@ -47,9 +45,7 @@ h1 {
 
 #backButton{
 	position: absolute;
-	left: 30px;
-	top: 30px;
-	z-index:1;
+	z-index: 1;
 	background: rgb(8, 37, 206);
 }
 #backButton::after{
@@ -58,8 +54,6 @@ h1 {
 
 #executeButton {
   position: absolute;
-  left: 420px;
-  top: 550px;
   z-index: 1;
   color: #fff;
   background: #40C659;
@@ -89,7 +83,6 @@ h1 {
 	text-decoration: none;
 	border-radius: 50%;
 	color: #fff;
-	visibility: hidden;
 }
 .circle_button:hover {
 	cursor: pointer;
@@ -112,7 +105,6 @@ h1 {
 	left: -0.5px;
 
 	transition: transform .5s ease;
-	visibility: hidden;
 }
 .circle_button:hover::after {
 	cursor: pointer;
@@ -122,4 +114,157 @@ h1 {
 	transform: scale(1.4, 1.4);
 	opacity: 0.7;
 	visibility: visible;
+}
+
+/* title button */
+.title-box {
+	flex: auto;
+	margin: 0px 10px;
+	background-color: #00E1FF;
+	width: auto;
+	height: auto;
+}
+.title-button {
+	line-height: 50px;
+	height: auto;
+	text-align: center;
+	width: auto;
+	cursor: pointer;
+	color: #FFF;
+	transition: all 0.5s;
+	position: relative;
+}
+.title-button::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	background-color: rgba(255, 255, 255, 0.1);
+	transition: all 0.3s;
+}
+.title-button:hover::before {
+	opacity: 0;
+	transform: scale(0.5, 0.5);
+}
+.title-button::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	opacity: 0;
+	transition: all 0.3s;
+	border: 1px solid rgba(255, 255, 255, 0.5);
+	transform: scale(1.2, 1.2);
+}
+.title-button:hover::after {
+	opacity: 1;
+	transform: scale(1, 1);
+}
+
+/* accordion */
+.accordion-check {
+	display: none;
+}
+.accordion-label {
+	background-color: #333333;
+	color: #fff;
+	display: block;
+	width: auto;
+	height: auto;
+	margin-bottom: 1px;
+	padding: 10px;
+}
+.accordion-content {
+	border: 1px solid #333;
+	height: 0;
+	opacity: 0;
+	padding: 0 10px;
+	transition: 0.5s;
+	visibility: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+}
+.accordion-check:checked + .accordion-label + .accordion-content {
+	height: auto;
+	max-height: 1980px;
+	opacity: 1;
+	padding: 10px;
+	visibility: visible;
+}
+
+/* message box */
+.message-box-text {
+	overflow-y: scroll;
+	height: 85px;
+}
+.message-box {
+	width: auto;
+	height: 100%;
+	z-index: 2;
+	background: #fff0cd;
+	box-shadow: 0px 0px 0px 5px #fff0cd;
+	border: dashed 2px white;
+	padding: 0.2em 0.5em;
+	color: #454545;
+}
+
+.message-box:after {
+	position: absolute;
+	content: '';
+	right: -7px;
+	top: -7px;
+	border-width: 0 15px 15px 0;
+	border-style: solid;
+	border-color: #ffdb88 #fff #ffdb88;
+	box-shadow: -1px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+/* modal */
+.modal-area {
+	visibility: hidden;
+	opacity: 0;
+	position: fixed;
+	z-index: 10;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	transition: 0.5s;
+}
+
+.modal-background {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(30, 30, 30, 0.9);
+}
+
+.modal-wrapper {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 70%;
+	max-width: 720px;
+	padding: 10px 30px;
+	background-color: #FFFFFF;
+}
+
+.modal-closer {
+	position: absolute;
+	top: 0.5rem;
+	right: 1rem;
+	cursor: pointer;
+}
+
+.modal-is-show {
+	visibility: visible;
+	opacity: 1;
 }
