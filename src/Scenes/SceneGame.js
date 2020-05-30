@@ -250,8 +250,11 @@ class SceneGame extends Phaser.Scene {
         const modalContents = document.createElement('div');
         modalContents.style.display = 'flex';
         modalContents.style.flexDirection = 'column';
-        modalContents.innerHTML = 'これ見える?';
         modalWrapper.appendChild(modalContents);
+        const congratuImage = document.createElement('img');
+        congratuImage.style.display = 'flex';
+        congratuImage.setAttribute('src', window.location.pathname.replace(new RegExp('\\\/[^\\\/]*$'), '') + '/stage/congratulations.png');
+        modalContents.appendChild(congratuImage);
         const modalButtons = document.createElement('div');
         modalButtons.style.display = 'flex';
         modalButtons.style.flexDirection = 'row';

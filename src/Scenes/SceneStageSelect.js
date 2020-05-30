@@ -6,6 +6,7 @@ class SceneStageSelect extends Phaser.Scene {
   constructor() {
     super({key: 'stage-select'});
   }
+
   preload() {
   }
 
