@@ -308,6 +308,7 @@ class SceneGame extends Phaser.Scene {
 
       // ジェネレータに変換
       code = '(function* () {' + code + '})';
+      console.log(code);
 
       try {
         this.commandGenerator = eval(code).bind(this)();

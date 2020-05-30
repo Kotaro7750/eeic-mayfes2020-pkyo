@@ -29,6 +29,11 @@ const stageList = [
     title: '<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby><ruby>付<rp>(</rp><rt>つ</rt><rp>)</rp></ruby>き<ruby>迷路<rp>(</rp><rt>めいろ</rt><rp>)</rp></ruby>',
     message: '<ruby>右手<rp>(</rp><rt>みぎて</rt><rp>)</rp></ruby>を<ruby>壁<rp>(</rp><rt>かべ</rt><rp>)</rp></ruby>につけたまま、<ruby>落<rp>(</rp><rt>お</rt><rp>)</rp></ruby>とし<ruby>穴<rp>(</rp><rt>あな</rt><rp>)</rp></ruby>の<ruby>前<rp>(</rp><rt>まえ</rt><rp>)</rp></ruby>でジャンプするんだけど...',
   },
+  {
+    id: 'function-basic2',
+    title: '<ruby>処理<rp>(</rp><rt>しょり</rt><rp>)</rp></ruby>のグループ<ruby>化<rp>(</rp><rt>か</rt><rp>)</rp></ruby>',
+    message: 'グループ<ruby>化<rp>(</rp><rt>か</rt><rp>)</rp></ruby>した<ruby>後<rp>(</rp><rt>あと</rt><rp>)</rp></ruby>の<ruby>処理<rp>(</rp><rt>しょり</rt><rp>)</rp></ruby>に<ruby>毎回<rp>(</rp><rt>まいかい</rt><rp>)</rp></ruby><ruby>違<rp>(</rp><rt>ちが</rt><rp>)</rp></ruby>う<ruby>処理<rp>(</rp><rt>しょり</rt><rp>)</rp></ruby>を<ruby>入<rp>(</rp><rt>い</rt><rp>)</rp></ruby>れてみよう！',
+  },
 ];
 
 export default stageList;
